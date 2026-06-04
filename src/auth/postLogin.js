@@ -2,10 +2,11 @@ import api from '../lib/api.js'
 import { supabase, hasSupabaseConfig } from '../lib/supabase.js'
 
 const CRM_BASE_URL = (import.meta.env.VITE_CRM_BASE_URL || 'https://crm.vitaloop.today').replace(/\/$/, '')
-const APP_BASE_URL = (import.meta.env.VITE_APP_BASE_URL || 'https://vitaloop.today').replace(/\/$/, '')
+const APP_BASE_URL = (import.meta.env.VITE_APP_BASE_URL || 'https://ua.vitaloop.today').replace(/\/$/, '')
 const CRM_ROLES = new Set(['super_admin', 'admin', 'org_admin', 'org_owner', 'client_admin', 'manager', 'practitioner'])
 
 export const AUTH_POST_LOGIN_PATH = import.meta.env.VITE_AUTH_POST_LOGIN_PATH || `${CRM_BASE_URL}/auth/post-login`
+export const AUTH_OAUTH_REDIRECT_PATH = import.meta.env.VITE_AUTH_OAUTH_REDIRECT_PATH || `${APP_BASE_URL}/dashboard`
 export const INVITATIONS_ACCEPT_PATH = import.meta.env.VITE_INVITATIONS_ACCEPT_PATH || `${CRM_BASE_URL}/invitations/accept`
 
 function isCrmHost() {

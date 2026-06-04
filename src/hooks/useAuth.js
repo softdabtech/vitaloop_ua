@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { supabase, hasSupabaseConfig } from '../lib/supabase.js'
-import { AUTH_POST_LOGIN_PATH } from '../auth/postLogin.js'
+import { AUTH_OAUTH_REDIRECT_PATH } from '../auth/postLogin.js'
 
 const CRM_BASE_URL = (import.meta.env.VITE_CRM_BASE_URL || 'https://crm.vitaloop.today').replace(/\/$/, '')
 
@@ -75,7 +75,7 @@ export function useAuth() {
     supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: AUTH_POST_LOGIN_PATH,
+        redirectTo: AUTH_OAUTH_REDIRECT_PATH,
       },
     })
 
