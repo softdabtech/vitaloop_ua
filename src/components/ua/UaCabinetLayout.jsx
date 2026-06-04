@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { Activity, BarChart3, CreditCard, FileText, Home, LogOut, Menu, Settings, Upload, X } from 'lucide-react'
 import { useAuth } from '../../hooks/useAuth.js'
+import Seo from '../Seo.jsx'
 
 const NAV_ITEMS = [
   { path: '/dashboard', label: 'Головна', icon: Home },
@@ -58,6 +59,7 @@ export default function UaCabinetLayout({ children }) {
   const { user, signOut } = useAuth()
   const [open, setOpen] = useState(false)
   const pageTitle = useMemo(() => PAGE_META[location.pathname] || 'VITALOOP Ukraine', [location.pathname])
+  const pageDescription = 'Особистий кабінет VITALOOP Ukraine для роботи із самопочуттям, симптомами, аналізами та персональними пріоритетами.'
 
   async function handleLogout() {
     try {
@@ -84,7 +86,14 @@ export default function UaCabinetLayout({ children }) {
   )
 
   return (
-    <div className="min-h-[100svh] bg-[#f8f5f0] text-[#0f172a]">
+    <>
+      <Seo
+        title={`${pageTitle} | VITALOOP Ukraine`}
+        description={pageDescription}
+        path={location.pathname}
+        noindex
+      />
+      <div className="min-h-[100svh] bg-[#f8f5f0] text-[#0f172a]">
       <div className="fixed inset-0 -z-10 bg-[radial-gradient(circle_at_18%_8%,rgba(96,165,250,0.18),transparent_30%),radial-gradient(circle_at_85%_0%,rgba(212,180,131,0.20),transparent_28%),linear-gradient(180deg,#f8f5f0_0%,#efebe5_100%)]" />
 
       <aside className="fixed left-0 top-0 z-40 hidden h-full w-[280px] border-r border-[#e8dfd2] bg-[#f8f5f0]/92 p-5 backdrop-blur-xl lg:block">
@@ -153,6 +162,7 @@ export default function UaCabinetLayout({ children }) {
           </div>
         </nav>
       </div>
-    </div>
+      </div>
+    </>
   )
 }
