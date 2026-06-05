@@ -8,6 +8,7 @@ import UaDashboard from './pages/ua-cabinet/UaDashboard.jsx'
 import UaUpload from './pages/ua-cabinet/UaUpload.jsx'
 import UaLabResults from './pages/ua-cabinet/UaLabResults.jsx'
 import UaResults from './pages/ua-cabinet/UaResults.jsx'
+import UaProtocol from './pages/ua-cabinet/UaProtocol.jsx'
 import UaQuestionnaire from './pages/ua-cabinet/UaQuestionnaire.jsx'
 import { UaSettings, UaSubscription } from './pages/ua-cabinet/UaSimplePage.jsx'
 import UaNotFound from './pages/UaNotFound.jsx'
@@ -68,7 +69,7 @@ export default function App() {
         <Route path="/results/:uploadId" element={<CabinetRoute><UaResults /></CabinetRoute>} />
         <Route path="/subscription" element={<CabinetRoute><UaSubscription /></CabinetRoute>} />
         <Route path="/settings" element={<CabinetRoute><UaSettings /></CabinetRoute>} />
-        <Route path="/protocol/:uploadId" element={<Navigate to="/lab-results" replace />} />
+        <Route path="/protocol/:uploadId" element={<CabinetRoute><UaProtocol /></CabinetRoute>} />
         <Route path="*" element={<UaNotFound />} />
       </Routes>
     </>

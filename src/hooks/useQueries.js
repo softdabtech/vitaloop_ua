@@ -1,6 +1,14 @@
 import { useQuery } from '@tanstack/react-query'
 import api from '../lib/api.js'
 
+function normalizeUploadsPayload(payload) {
+  if (Array.isArray(payload)) return payload
+  if (Array.isArray(payload?.items)) return payload.items
+  if (Array.isArray(payload?.data)) return payload.data
+  if (Array.isArray(payload?.uploads)) return payload.uploads
+  return []
+}
+
 // Dashboard summary (stats, assignments)
 export const useDashboardSummary = () =>
   useQuery({
@@ -149,8 +157,20 @@ export const useLabResultsList = () =>
   useQuery({
     queryKey: ['lab-results-list'],
     queryFn: async () => {
-      const { data } = await api.get('/lab-results')
-      return Array.isArray(data) ? data : []
+      try {
+        const { data } = await api.get('/progress')
+        const progressItems = normalizeUploadsPayload(data)
+        if (progressItems.length > 0) return progressItems
+      } catch {
+        // The cabinet list should stay available even if progress aggregation is unavailable.
+      }
+
+      try {
+        const { data } = await api.get('/uploads/recent')
+        return normalizeUploadsPayload(data)
+      } catch {
+        return []
+      }
     },
     staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,

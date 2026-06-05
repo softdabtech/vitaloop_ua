@@ -58,7 +58,11 @@ export default function UaCabinetLayout({ children }) {
   const location = useLocation()
   const { user, signOut } = useAuth()
   const [open, setOpen] = useState(false)
-  const pageTitle = useMemo(() => PAGE_META[location.pathname] || 'VITALOOP Ukraine', [location.pathname])
+  const pageTitle = useMemo(() => {
+    if (location.pathname.startsWith('/results/')) return 'Результат аналізу'
+    if (location.pathname.startsWith('/protocol/')) return 'План дій'
+    return PAGE_META[location.pathname] || 'VITALOOP Ukraine'
+  }, [location.pathname])
   const pageDescription = 'Особистий кабінет VITALOOP Ukraine для роботи із самопочуттям, симптомами, аналізами та персональними пріоритетами.'
 
   async function handleLogout() {
