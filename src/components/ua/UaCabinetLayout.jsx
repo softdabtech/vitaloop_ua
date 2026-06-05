@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { Activity, BarChart3, CreditCard, FileText, Home, LogOut, Menu, Settings, Upload, X } from 'lucide-react'
+import { Activity, CreditCard, FileText, Home, LogOut, Menu, Settings, Upload, X } from 'lucide-react'
 import { useAuth } from '../../hooks/useAuth.js'
 import Seo from '../Seo.jsx'
 
@@ -101,10 +101,10 @@ export default function UaCabinetLayout({ children }) {
         <div className="mt-8">{nav}</div>
         <div className="absolute bottom-5 left-5 right-5 rounded-[22px] bg-white/72 p-4 ring-1 ring-[#e8dfd2]">
           <div className="flex items-center gap-2 text-xs font-black uppercase tracking-[0.12em] text-[#0f766e]">
-            <BarChart3 className="h-4 w-4" />
-            Український кабінет
+            <span className="grid h-6 w-6 place-items-center rounded-full bg-[#f1fbf8] text-[13px] ring-1 ring-[#b7d8d2]" aria-label="Герб України">🔱</span>
+            VITALOOP Ukraine
           </div>
-          <p className="mt-2 text-sm leading-6 text-[#64748b]">Одна логіка з основним продуктом, окремий інтерфейс для UA-напряму.</p>
+          <p className="mt-2 text-sm leading-6 text-[#64748b]">Український простір продукту: мова, лабораторії й сценарії здоровʼя ближчі до локального контексту.</p>
         </div>
       </aside>
 
@@ -124,7 +124,7 @@ export default function UaCabinetLayout({ children }) {
         <header className="sticky top-0 z-30 border-b border-[#e8dfd2]/80 bg-[#f8f5f0]/88 backdrop-blur-xl">
           <div className="mx-auto flex h-[68px] max-w-[1240px] items-center justify-between gap-3 px-4 sm:px-6">
             <div className="flex min-w-0 items-center gap-3">
-              <button onClick={() => setOpen(true)} className="rounded-2xl bg-white p-2.5 ring-1 ring-[#e8dfd2] lg:hidden">
+              <button onClick={() => setOpen(true)} className="grid h-11 w-11 place-items-center rounded-2xl bg-white ring-1 ring-[#e8dfd2] lg:hidden" aria-label="Відкрити меню">
                 <Menu className="h-5 w-5" />
               </button>
               <div className="min-w-0">
@@ -132,7 +132,7 @@ export default function UaCabinetLayout({ children }) {
                 <p className="truncate text-xs font-semibold text-[#64748b]">{user?.email || 'VITALOOP Ukraine'}</p>
               </div>
             </div>
-            <button onClick={handleLogout} className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-black text-[#0f172a] ring-1 ring-[#e8dfd2] transition hover:-translate-y-0.5 hover:text-[#0f766e]">
+            <button onClick={handleLogout} className="inline-flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-black text-[#0f172a] ring-1 ring-[#e8dfd2] transition hover:-translate-y-0.5 hover:text-[#0f766e]" aria-label="Вийти з акаунта">
               <LogOut className="h-4 w-4" />
               <span className="hidden sm:inline">Вийти</span>
             </button>

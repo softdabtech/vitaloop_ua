@@ -60,19 +60,19 @@ export default function UaDashboard() {
               </button>
             </div>
           </div>
-          <div className="rounded-[30px] bg-[#0f172a] p-5 text-white shadow-[0_28px_70px_rgba(15,23,42,0.24)]">
-            <p className="text-xs font-black uppercase tracking-[0.16em] text-[#9dd8d1]">Індекс пріоритетів</p>
+          <div className="rounded-[30px] bg-[linear-gradient(145deg,#ffffff_0%,#f1fbf8_58%,#fff8e7_100%)] p-5 text-[#0f172a] shadow-[0_24px_60px_rgba(15,118,110,0.12)] ring-1 ring-[#d7eee9]">
+            <p className="text-xs font-black uppercase tracking-[0.16em] text-[#0f766e]">Індекс пріоритетів</p>
             <div className="mt-5 flex items-end gap-2">
               <span className="text-6xl font-black">{priorityScore}</span>
-              <span className="pb-2 text-xl font-bold text-white/55">/100</span>
+              <span className="pb-2 text-xl font-bold text-[#64748b]">/100</span>
             </div>
-            <div className="mt-5 h-3 overflow-hidden rounded-full bg-white/12">
+            <div className="mt-5 h-3 overflow-hidden rounded-full bg-[#e8dfd2]">
               <div className="h-full rounded-full bg-[linear-gradient(90deg,#14b8a6,#60a5fa,#d4b483)]" style={{ width: `${priorityScore}%` }} />
             </div>
             <div className="mt-5 grid grid-cols-3 gap-2 text-center text-xs font-black">
-              <div className="rounded-2xl bg-white/10 p-3">Стан<br /><span className="text-white/55">{hasSymptoms ? 'є' : 'немає'}</span></div>
-              <div className="rounded-2xl bg-white/10 p-3">Аналізи<br /><span className="text-white/55">{totalUploads}</span></div>
-              <div className="rounded-2xl bg-white/10 p-3">План<br /><span className="text-white/55">{isPremium ? 'Premium' : 'Free'}</span></div>
+              <div className="rounded-2xl bg-white/70 p-3 ring-1 ring-[#e8dfd2]">Стан<br /><span className="text-[#64748b]">{hasSymptoms ? 'є' : 'немає'}</span></div>
+              <div className="rounded-2xl bg-white/70 p-3 ring-1 ring-[#e8dfd2]">Аналізи<br /><span className="text-[#64748b]">{totalUploads}</span></div>
+              <div className="rounded-2xl bg-white/70 p-3 ring-1 ring-[#e8dfd2]">План<br /><span className="text-[#64748b]">{isPremium ? 'Premium' : 'Free'}</span></div>
             </div>
           </div>
         </div>

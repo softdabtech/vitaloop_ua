@@ -1,4 +1,4 @@
-import { ArrowRight, FileText, Plus } from 'lucide-react'
+import { ArrowRight, Calendar, FileText, Plus } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import api from '../../lib/api.js'
@@ -7,11 +7,48 @@ function useUaUploads() {
   return useQuery({
     queryKey: ['ua-uploads-recent'],
     queryFn: async () => {
-      const { data } = await api.get('/uploads/recent')
-      return Array.isArray(data) ? data : []
+      try {
+        const { data } = await api.get('/progress')
+        if (Array.isArray(data) && data.length > 0) return data
+        if (Array.isArray(data?.items) && data.items.length > 0) return data.items
+      } catch {
+        // Free users or local preview can fail on /progress; recent uploads is the safe fallback.
+      }
+      try {
+        const { data } = await api.get('/uploads/recent')
+        return Array.isArray(data) ? data : Array.isArray(data?.items) ? data.items : []
+      } catch {
+        return []
+      }
     },
     staleTime: 3 * 60 * 1000,
   })
+}
+
+function normalizeStatus(status) {
+  const value = String(status || '').toLowerCase()
+  if (value.includes('optimal') || value.includes('normal')) return 'optimal'
+  if (value.includes('deficient') || value.includes('elevated') || value.includes('critical')) return 'attention'
+  return 'review'
+}
+
+function markerCounts(item) {
+  const biomarkers = Array.isArray(item?.biomarkers) ? item.biomarkers : []
+  return {
+    total: biomarkers.length,
+    optimal: biomarkers.filter((marker) => normalizeStatus(marker?.status) === 'optimal').length,
+    attention: biomarkers.filter((marker) => normalizeStatus(marker?.status) === 'attention').length,
+    review: biomarkers.filter((marker) => normalizeStatus(marker?.status) === 'review').length,
+  }
+}
+
+function itemDate(item) {
+  const raw = item?.test_date || item?.created_at || item?.updated_at
+  return raw ? new Date(raw).toLocaleDateString('uk-UA', { day: '2-digit', month: 'short', year: 'numeric' }) : 'Дата не вказана'
+}
+
+function itemId(item) {
+  return item?.upload_id || item?.id
 }
 
 export default function UaLabResults() {
@@ -48,16 +85,52 @@ export default function UaLabResults() {
           </div>
         </section>
       ) : (
-        <div className="grid gap-3">
-          {uploads.map((item) => (
-            <button key={item.id} onClick={() => navigate(`/results/${item.id}`)} className="flex items-center justify-between gap-4 rounded-[24px] bg-white/82 p-5 text-left ring-1 ring-[#e8dfd2] transition hover:-translate-y-0.5 hover:shadow-[0_18px_45px_rgba(15,118,110,0.10)]">
-              <div className="min-w-0">
-                <p className="truncate text-lg font-black">{item.lab_name || 'Лабораторний результат'}</p>
-                <p className="mt-1 text-sm font-semibold text-[#64748b]">{item.created_at ? new Date(item.created_at).toLocaleDateString('uk-UA') : 'Дата не вказана'} · {item.status || 'done'}</p>
-              </div>
-              <ArrowRight className="h-5 w-5 shrink-0 text-[#0f766e]" />
-            </button>
-          ))}
+        <div className="grid gap-4">
+          <div className="grid gap-3 sm:grid-cols-3">
+            <div className="rounded-[24px] bg-white/78 p-4 ring-1 ring-[#e8dfd2]">
+              <p className="text-xs font-black uppercase tracking-[0.14em] text-[#64748b]">Завантажень</p>
+              <p className="mt-2 text-3xl font-black">{uploads.length}</p>
+            </div>
+            <div className="rounded-[24px] bg-[#f1fbf8] p-4 ring-1 ring-[#b7d8d2]">
+              <p className="text-xs font-black uppercase tracking-[0.14em] text-[#0f766e]">Останній файл</p>
+              <p className="mt-2 truncate text-base font-black">{uploads[0]?.lab_name || 'Лабораторний результат'}</p>
+            </div>
+            <div className="rounded-[24px] bg-[#fff8e7] p-4 ring-1 ring-[#ead7ab]">
+              <p className="text-xs font-black uppercase tracking-[0.14em] text-[#9a6a1d]">Наступний крок</p>
+              <p className="mt-2 text-sm font-bold text-[#475569]">Відкрити маркери й пріоритети</p>
+            </div>
+          </div>
+
+          {uploads.map((item, index) => {
+            const counts = markerCounts(item)
+            const uploadId = itemId(item)
+            return (
+              <button key={uploadId || `${itemDate(item)}-${index}`} onClick={() => uploadId && navigate(`/results/${uploadId}`)} className="rounded-[26px] bg-white/82 p-5 text-left ring-1 ring-[#e8dfd2] transition hover:-translate-y-0.5 hover:shadow-[0_18px_45px_rgba(15,118,110,0.10)] disabled:cursor-not-allowed disabled:opacity-60" disabled={!uploadId}>
+                <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+                  <div className="min-w-0">
+                    <p className="truncate text-lg font-black">{item.lab_name || `Лабораторний результат #${uploads.length - index}`}</p>
+                    <p className="mt-2 flex items-center gap-2 text-sm font-semibold text-[#64748b]">
+                      <Calendar className="h-4 w-4" />
+                      {itemDate(item)}
+                      <span className="rounded-full bg-[#f8f5f0] px-2 py-1 text-xs font-black text-[#64748b] ring-1 ring-[#e8dfd2]">{item.status || 'оброблено'}</span>
+                    </p>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-2 text-xs font-black">
+                    {counts.total > 0 ? (
+                      <>
+                        <span className="rounded-full bg-[#f1fbf8] px-3 py-2 text-[#0f766e] ring-1 ring-[#b7d8d2]">У межах {counts.optimal}</span>
+                        <span className="rounded-full bg-[#fff8e7] px-3 py-2 text-[#9a6a1d] ring-1 ring-[#ead7ab]">Переглянути {counts.review}</span>
+                        <span className="rounded-full bg-[#fff1f2] px-3 py-2 text-[#be123c] ring-1 ring-[#fecdd3]">Увага {counts.attention}</span>
+                      </>
+                    ) : (
+                      <span className="rounded-full bg-[#f8f5f0] px-3 py-2 text-[#64748b] ring-1 ring-[#e8dfd2]">Маркери відкриються у підсумку</span>
+                    )}
+                    <ArrowRight className="h-5 w-5 text-[#0f766e]" />
+                  </div>
+                </div>
+              </button>
+            )
+          })}
         </div>
       )}
     </div>

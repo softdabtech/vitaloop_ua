@@ -87,7 +87,7 @@ export default function UaUpload() {
             </label>
           </div>
 
-          <button disabled={busy} className="inline-flex min-h-13 items-center justify-center gap-2 rounded-full bg-[linear-gradient(135deg,#0f766e_0%,#14b8a6_58%,#d4b483_135%)] px-6 text-sm font-black text-white shadow-[0_16px_35px_rgba(15,118,110,0.22)] transition hover:-translate-y-0.5 disabled:opacity-70">
+          <button disabled={busy} className="inline-flex min-h-[58px] w-full items-center justify-center gap-3 rounded-full bg-[linear-gradient(135deg,#0f766e_0%,#14b8a6_58%,#d4b483_135%)] px-7 text-base font-black text-white shadow-[0_18px_42px_rgba(15,118,110,0.24)] transition hover:-translate-y-0.5 disabled:opacity-70 sm:w-fit sm:min-w-[260px]">
             {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <ArrowRight className="h-4 w-4" />}
             {busy ? `Обробляємо ${seconds ? `${seconds}с` : ''}` : 'Завантажити аналіз'}
           </button>
