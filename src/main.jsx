@@ -5,6 +5,7 @@ import { HelmetProvider } from 'react-helmet-async'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { Toaster } from 'react-hot-toast'
 import App from './App.jsx'
+import UaErrorBoundary from './components/UaErrorBoundary.jsx'
 import './styles/index.css'
 
 const queryClient = new QueryClient({
@@ -23,7 +24,9 @@ ReactDOM.createRoot(document.getElementById('root')).render(
     <QueryClientProvider client={queryClient}>
       <HelmetProvider>
         <BrowserRouter>
-          <App />
+          <UaErrorBoundary>
+            <App />
+          </UaErrorBoundary>
         </BrowserRouter>
         <Toaster
           position="top-right"

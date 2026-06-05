@@ -12,6 +12,16 @@ const api = axios.create({
   timeout: 30_000, // 30 s — prevents requests from hanging indefinitely
 })
 
+function redirectToLoginAfterSessionExpired() {
+  if (typeof window === 'undefined') return
+  if (window.location.pathname.startsWith('/login')) return
+
+  toast.error('Сесію завершено. Увійдіть ще раз.', { id: 'session-expired' })
+  window.setTimeout(() => {
+    window.location.assign('/login')
+  }, 150)
+}
+
 function readAccessTokenFromSupabaseStorage() {
   if (typeof window === 'undefined') return null
 
@@ -86,26 +96,27 @@ api.interceptors.response.use(
           Array.isArray(item.loc) && item.loc.includes('protocol_adherence')
         ))
         if (scoreError) {
-          return 'Check-in score must be between 1 and 5.'
+          return 'Оцінка check-in має бути від 1 до 5.'
         }
         if (typeof detail === 'string' && detail.trim()) {
           return detail
         }
-        return 'Validation failed. Check your input and try again.'
+        return 'Перевірте введені дані й спробуйте ще раз.'
       }
 
       const messages: Record<string, string> = {
-        LAB_TEXT_TOO_SHORT: 'Lab text too short — try a clearer photo.',
-        UPLOAD_NOT_FOUND: 'Upload not found or access denied.',
-        PROGRESS_NOT_FOUND: 'No progress data yet.',
-        NETWORK_ERROR: 'Network error — check your connection.',
+        LAB_TEXT_TOO_SHORT: 'У файлі замало тексту. Спробуйте чіткіший PDF або фото.',
+        UPLOAD_NOT_FOUND: 'Аналіз не знайдено або доступ закритий.',
+        PROGRESS_NOT_FOUND: 'Динаміки ще немає.',
+        NETWORK_ERROR: 'Проблема з мережею. Перевірте зʼєднання.',
+        SERVICE_UNAVAILABLE: 'Сервіс тимчасово недоступний. Спробуйте трохи пізніше.',
       }
 
       if (typeof detail === 'string' && detail.trim() && detail.length < 200) {
         return detail
       }
 
-      return messages[code] || 'Something went wrong.'
+      return messages[code] || 'Не вдалося виконати дію. Спробуйте ще раз.'
     }
 
     if (status === 401) {
@@ -135,26 +146,19 @@ api.interceptors.response.use(
         }
       }
 
-      // Only force global sign-out on auth boundary calls.
-      // For other endpoints we propagate the error so screens can degrade gracefully.
-      if (authBoundary) {
-        const token = await resolveAccessToken()
+      const token = await resolveAccessToken()
 
-        // Public pages can call /auth/me for optional UI state.
-        // Guests have no token, so do not force navigation to /login.
-        if (!token) {
-          return Promise.reject(error)
-        }
-
-        if (hasSupabaseConfig) {
-          await supabase.auth.signOut()
-        }
-
-        // Avoid hard-navigation loops and visible screen flicker when already on login.
-        if (!window.location.pathname.startsWith('/login')) {
-          window.location.href = '/login'
-        }
+      // Public pages can call /auth/me for optional UI state.
+      // Guests have no token, so do not force navigation to /login.
+      if (!token) {
+        return Promise.reject(error)
       }
+
+      if (hasSupabaseConfig) {
+        await supabase.auth.signOut()
+      }
+
+      redirectToLoginAfterSessionExpired()
       return Promise.reject(error)
     }
 
@@ -171,12 +175,12 @@ api.interceptors.response.use(
 
     if (status === 403) {
       if (code === 'ACCESS_DENIED') {
-        toast.error('Access denied', { id: 'access-denied' })
+        toast.error('Доступ заборонено', { id: 'access-denied' })
       } else {
         const messages: Record<string, string> = {
-          UPLOAD_NOT_FOUND: 'Upload not found or access denied.',
+          UPLOAD_NOT_FOUND: 'Аналіз не знайдено або доступ закритий.',
         }
-        toast.error(messages[code] || 'Access denied.', { id: code || 'forbidden' })
+        toast.error(messages[code] || 'Доступ заборонено.', { id: code || 'forbidden' })
       }
       return Promise.reject(error)
     }

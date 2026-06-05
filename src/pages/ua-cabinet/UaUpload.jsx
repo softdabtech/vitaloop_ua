@@ -13,6 +13,7 @@ export default function UaUpload() {
   const [symptoms, setSymptoms] = useState('')
   const [busy, setBusy] = useState(false)
   const [seconds, setSeconds] = useState(0)
+  const [uploadProgress, setUploadProgress] = useState(0)
 
   useEffect(() => {
     if (!busy) {
@@ -44,9 +45,14 @@ export default function UaUpload() {
     symptoms.split(',').map((item) => item.trim()).filter(Boolean).forEach((item) => form.append('symptoms', item))
 
     setBusy(true)
+    setUploadProgress(0)
     try {
       const { data } = await api.post('/analyze/pdf', form, {
         headers: { 'Content-Type': 'multipart/form-data' },
+        onUploadProgress: (event) => {
+          if (!event.total) return
+          setUploadProgress(Math.min(100, Math.round((event.loaded * 100) / event.total)))
+        },
       })
       toast.success('Аналіз оброблено')
       navigate(`/results/${data.upload_id}`)
@@ -56,6 +62,7 @@ export default function UaUpload() {
       toast.error(message || 'Не вдалося обробити файл. Спробуйте ще раз.')
     } finally {
       setBusy(false)
+      setUploadProgress(0)
     }
   }
 
@@ -89,8 +96,19 @@ export default function UaUpload() {
 
           <button disabled={busy} className="inline-flex min-h-[58px] w-full items-center justify-center gap-3 rounded-full bg-[linear-gradient(135deg,#0f766e_0%,#14b8a6_58%,#d4b483_135%)] px-7 text-base font-black text-white shadow-[0_18px_42px_rgba(15,118,110,0.24)] transition hover:-translate-y-0.5 disabled:opacity-70 sm:w-fit sm:min-w-[260px]">
             {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <ArrowRight className="h-4 w-4" />}
-            {busy ? `Обробляємо ${seconds ? `${seconds}с` : ''}` : 'Завантажити аналіз'}
+            {busy ? (uploadProgress < 100 ? `Завантажуємо ${uploadProgress}%` : `Обробляємо ${seconds ? `${seconds}с` : ''}`) : 'Завантажити аналіз'}
           </button>
+          {busy && (
+            <div className="rounded-2xl bg-[#f8f5f0] p-3 ring-1 ring-[#e8dfd2]" role="status" aria-live="polite">
+              <div className="flex items-center justify-between gap-3 text-xs font-black uppercase tracking-[0.12em] text-[#64748b]">
+                <span>{uploadProgress < 100 ? 'Завантаження файлу' : 'Обробка результату'}</span>
+                <span>{uploadProgress}%</span>
+              </div>
+              <div className="mt-2 h-2 overflow-hidden rounded-full bg-[#e8dfd2]">
+                <div className="h-full rounded-full bg-[linear-gradient(90deg,#0f766e,#14b8a6,#d4b483)] transition-all duration-300" style={{ width: `${uploadProgress}%` }} />
+              </div>
+            </div>
+          )}
         </form>
       </section>
 
