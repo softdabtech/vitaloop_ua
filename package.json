@@ -6,7 +6,7 @@
   "description": "Standalone Ukrainian VITALOOP frontend for ua.vitaloop.today.",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build && node ./scripts/generate-crawler-pages.mjs",
     "preview": "vite preview",
     "lint": "eslint src --ext .js,.jsx,.ts,.tsx"
   },
