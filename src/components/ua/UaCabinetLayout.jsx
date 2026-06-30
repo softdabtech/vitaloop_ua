@@ -97,7 +97,7 @@ export default function UaCabinetLayout({ children }) {
         path={location.pathname}
         noindex
       />
-      <div className="min-h-[100svh] bg-[#f8f5f0] text-[#0f172a]">
+      <div className="min-h-[100svh] overflow-x-hidden bg-[#f8f5f0] text-[#0f172a]">
       <div className="fixed inset-0 -z-10 bg-[radial-gradient(circle_at_18%_8%,rgba(96,165,250,0.18),transparent_30%),radial-gradient(circle_at_85%_0%,rgba(212,180,131,0.20),transparent_28%),linear-gradient(180deg,#f8f5f0_0%,#efebe5_100%)]" />
 
       <aside className="fixed left-0 top-0 z-40 hidden h-full w-[280px] border-r border-[#e8dfd2] bg-[#f8f5f0]/92 p-5 backdrop-blur-xl lg:block">
@@ -156,10 +156,10 @@ export default function UaCabinetLayout({ children }) {
                 <button
                   key={item.path}
                   onClick={() => navigate(item.path)}
-                  className={`flex min-h-[54px] flex-col items-center justify-center rounded-2xl text-[11px] font-black transition ${active ? 'bg-[#0f766e] text-white' : 'text-[#64748b] hover:bg-white'}`}
+                  className={`flex min-h-[54px] flex-col items-center justify-center rounded-2xl px-1 text-[10px] font-black leading-tight transition ${active ? 'bg-[#0f766e] text-white' : 'text-[#64748b] hover:bg-white'}`}
                 >
                   <Icon className="h-5 w-5" />
-                  <span className="mt-1">{item.label}</span>
+                  <span className="mt-1 max-w-full truncate">{item.label}</span>
                 </button>
               )
             })}

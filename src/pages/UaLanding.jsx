@@ -525,7 +525,7 @@ export default function UaLanding() {
             <div className="rounded-[32px] bg-white p-5 shadow-[0_28px_90px_rgba(15,23,42,0.10)] ring-1 ring-[#e5dfd6] sm:p-6">
               <div className="flex flex-col gap-4 border-b border-[#e5dfd6] pb-5 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                  <p className="text-xs font-black uppercase tracking-[0.14em] text-[#0f766e]">Personal result</p>
+                  <p className="text-xs font-black uppercase tracking-[0.14em] text-[#0f766e]">Особистий підсумок</p>
                   <h3 className="mt-2 text-2xl font-black text-[#0f172a]">Персональний підсумок</h3>
                 </div>
                 <span className="w-fit rounded-full bg-[#f4eadb] px-4 py-2 text-xs font-black text-[#8a6a30]">Освітній приклад</span>

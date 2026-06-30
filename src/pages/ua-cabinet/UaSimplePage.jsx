@@ -46,9 +46,9 @@ function fmtDate(value) {
 
 function planLabel(plan) {
   const normalized = String(plan || '').toLowerCase()
-  if (normalized.includes('personal') || normalized.includes('premium') || normalized.includes('core')) return 'Premium'
-  if (normalized.includes('practitioner')) return 'Practitioner'
-  return plan || 'Free'
+  if (normalized.includes('personal') || normalized.includes('premium') || normalized.includes('core')) return 'Преміум'
+  if (normalized.includes('practitioner')) return 'Практик'
+  return plan || 'Безкоштовно'
 }
 
 function statusLabel(status) {
@@ -57,7 +57,7 @@ function statusLabel(status) {
   if (normalized === 'past_due') return 'Потрібна оплата'
   if (normalized === 'cancelled' || normalized === 'canceled') return 'Скасована'
   if (normalized === 'paused') return 'Пауза'
-  return 'Free'
+  return 'Безкоштовно'
 }
 
 function normalizePrefs(source = {}) {
@@ -295,7 +295,7 @@ export function UaSettings() {
         <div className="mt-6 grid gap-4 md:grid-cols-2">
           <div className="rounded-2xl bg-white/78 p-4 ring-1 ring-[#fed7aa]">
             <h3 className="font-black text-[#9a3412]">Підписка</h3>
-            <p className="mt-2 text-sm leading-6 text-[#9a3412]">{isPremium ? 'Можна скасувати Premium. Доступ зберігається до кінця оплаченого періоду.' : 'Зараз активний Free-план.'}</p>
+            <p className="mt-2 text-sm leading-6 text-[#9a3412]">{isPremium ? 'Можна скасувати Преміум. Доступ зберігається до кінця оплаченого періоду.' : 'Зараз активний безкоштовний план.'}</p>
             {isPremium && (
               cancelConfirm ? (
                 <div className="mt-4 grid gap-2 sm:grid-cols-2">
@@ -363,7 +363,7 @@ export function UaSubscription() {
         window.location.href = data.checkout_url
         return
       }
-      toast.error('Stripe не повернув checkout-посилання.')
+      toast.error('Stripe не повернув посилання для оплати.')
     } catch (error) {
       toast.error(error?.response?.data?.detail || 'Не вдалося відкрити оплату Stripe.')
     } finally {
@@ -380,7 +380,7 @@ export function UaSubscription() {
         window.open(data.portal_url, '_blank')
         return
       }
-      toast.error('Stripe portal тимчасово недоступний.')
+      toast.error('Портал Stripe тимчасово недоступний.')
     } catch (error) {
       toast.error(error?.response?.data?.detail || 'Не вдалося відкрити Stripe portal.')
     } finally {

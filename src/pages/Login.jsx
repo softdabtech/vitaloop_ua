@@ -177,8 +177,8 @@ export default function Login({ pendingConfirmation = false }) {
                   {message && <div className="mt-5 rounded-[18px] bg-[#fff7ed] p-4 text-sm leading-6 text-[#9a3412] ring-1 ring-[#fed7aa]">{message}</div>}
                   <form onSubmit={handleSubmit} className="mt-6 grid gap-4">
                     <label className="grid gap-2">
-                      <span className="text-xs font-black uppercase tracking-[0.12em] text-[#6b7280]">Email</span>
-                      <input type="email" required placeholder="you@example.com" value={email} onChange={(e) => setEmail(e.target.value)} className="min-h-12 rounded-[18px] border border-[#e5dfd6] bg-[#f8f5f0] px-4 text-base font-semibold outline-none transition placeholder:text-[#9ca3af] focus:border-[#14b8a6] focus:bg-white focus:ring-4 focus:ring-[#14b8a6]/10" />
+                      <span className="text-xs font-black uppercase tracking-[0.12em] text-[#6b7280]">Електронна пошта</span>
+                      <input type="email" required placeholder="mail@example.com" value={email} onChange={(e) => setEmail(e.target.value)} className="min-h-12 rounded-[18px] border border-[#e5dfd6] bg-[#f8f5f0] px-4 text-base font-semibold outline-none transition placeholder:text-[#9ca3af] focus:border-[#14b8a6] focus:bg-white focus:ring-4 focus:ring-[#14b8a6]/10" />
                     </label>
 
                     {!isForgot && (
