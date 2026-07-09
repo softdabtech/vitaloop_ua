@@ -52,6 +52,19 @@ function translateTitle(text) {
 }
 
 function translateBody(item, fallback) {
+  const apiText = [
+    item?.body,
+    item?.description,
+    item?.rationale,
+    item?.why_it_matters,
+    item?.summary,
+    item?.dosage,
+  ]
+    .map((value) => String(value || '').trim())
+    .find((value) => value && value !== 'undefined' && value !== 'null')
+
+  if (apiText) return apiText
+
   const combined = `${item?.title || ''} ${item?.body || ''} ${item?.description || ''}`.toLowerCase()
   if (combined.includes('ferritin') || combined.includes('iron')) {
     return 'Феритин і показники крові варто оцінювати разом із симптомами, харчуванням, CRP, можливими втратами крові та ліками. Це хороший пункт для розмови з лікарем.'
