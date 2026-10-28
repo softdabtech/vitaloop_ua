@@ -1,0 +1,1 @@
+import{a as c}from"./lib-api-Cd0BJmQK.js";function i(e,n){return`vitaloop:funnel:${e}:${n||"global"}`}async function l(e,n,a={},t={}){const o=!!t.oncePerSession,r=t.scopeKey||"",s=i(e,r);if(!(o&&sessionStorage.getItem(s)==="1"))try{await c.post("/timeline/event",{event_type:e,summary:n,source:"frontend:funnel",metadata:a}),o&&sessionStorage.setItem(s,"1")}catch{}}export{l as t};

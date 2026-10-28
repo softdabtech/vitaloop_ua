@@ -1,0 +1,1 @@
+import{c as i}from"./CRMErrorState-D_g1paCK.js";function r(t){return i.post("/crm/questionnaires/submit",t)}function u(t={}){const e=new URLSearchParams;t.entityType&&e.set("entity_type",t.entityType),t.userId&&e.set("user_id",t.userId);const n=e.toString()?`?${e.toString()}`:"";return i.get(`/crm/audit-logs${n}`)}export{u as g,r as s};

@@ -1,0 +1,29 @@
+User-agent: *
+Allow: /
+
+Disallow: /api/
+Disallow: /dashboard
+Disallow: /dashboard/
+Disallow: /upload
+Disallow: /lab-plan
+Disallow: /avatar
+Disallow: /lab-results
+Disallow: /lab-results/
+Disallow: /results/
+Disallow: /protocol/
+Disallow: /settings
+Disallow: /assignments
+Disallow: /check-ins
+Disallow: /insights
+Disallow: /health-profile
+Disallow: /billing-history
+Disallow: /help-center
+Disallow: /subscription
+Disallow: /onboarding
+Disallow: /questionnaire
+Disallow: /admin
+Disallow: /ops
+Disallow: /login
+Disallow: /auth/confirmation
+
+Sitemap: https://ua.vitaloop.today/sitemap.xml

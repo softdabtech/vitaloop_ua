@@ -1,0 +1,1 @@
+import{c as r}from"./CRMErrorState-D_g1paCK.js";function n(){return r.get("/crm/practitioners")}function c(t){return r.get(`/crm/practitioners/${t}`)}function e(t){return r.post("/crm/practitioners",t)}function a(t){return r.post("/crm/practitioners/assign",t)}export{c as a,a as b,e as c,n as g};

@@ -1,0 +1,26 @@
+# VITALOOP Ukraine
+
+> VITALOOP Ukraine — україномовна версія освітньої HealthTech-платформи для впорядкування симптомів, лабораторних показників, запитань до лікаря та динаміки стану.
+
+## Офіційні сторінки
+- [Головна](https://ua.vitaloop.today/)
+- [Самопочуття](https://ua.vitaloop.today/samopochuttia/)
+- [Симптоми](https://ua.vitaloop.today/symptomy/)
+- [Аналізи](https://ua.vitaloop.today/analizy/)
+- [Підтримувані лабораторні бланки](https://ua.vitaloop.today/laboratorii/)
+- [Тарифи](https://ua.vitaloop.today/tarify/)
+- [Питання та відповіді](https://ua.vitaloop.today/faq/)
+- [База знань](https://ua.vitaloop.today/health-hub/)
+- [Політика приватності](https://ua.vitaloop.today/privacy-policy/)
+- [Умови користування](https://ua.vitaloop.today/terms/)
+- [Sitemap](https://ua.vitaloop.today/sitemap.xml)
+- [Robots](https://ua.vitaloop.today/robots.txt)
+
+## Що робить VITALOOP
+- Допомагає структурувати симптоми та контекст самопочуття.
+- Пояснює лабораторні показники, референси й динаміку простою мовою.
+- Допомагає підготувати запитання для кваліфікованого медичного фахівця.
+- Формує освітній підсумок і безпечні наступні кроки.
+
+## Важливо
+VITALOOP не ставить діагноз, не призначає лікування і не замінює лікаря. Матеріали мають освітній характер.

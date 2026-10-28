@@ -1,0 +1,1 @@
+import{c as e}from"./CRMErrorState-D_g1paCK.js";function c(t={}){const r=new URLSearchParams;t.category&&r.set("category",t.category),t.limit&&r.set("limit",String(t.limit)),t.offset&&r.set("offset",String(t.offset));const o=r.toString()?`?${r.toString()}`:"";return e.get(`/crm/programs${o}`)}function f(t){return e.post("/crm/programs",t)}export{f as c,c as g};

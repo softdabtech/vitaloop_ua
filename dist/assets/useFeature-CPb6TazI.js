@@ -1,0 +1,1 @@
+import{u as o}from"./useQueries-kbx7YhUu.js";const u=r=>{const{data:s,isLoading:t}=o(),e={insights:!0,progress:!0,advanced_protocol:!0,health_score:!0,trend_analysis:!0,predictions:!0,check_ins:!0}[r]||!1;return{hasAccess:!e||!!(s!=null&&s.is_premium),isLoading:t,requiresPremium:e}};export{u};
