@@ -1,728 +1,940 @@
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
-  Activity,
   ArrowRight,
-  BarChart3,
-  BrainCircuit,
   Check,
   ChevronDown,
-  ClipboardList,
-  FileSearch,
-  FlaskConical,
-  HeartPulse,
+  FileImage,
+  FileUp,
+  LockKeyhole,
   Menu,
-  MessageCircle,
-  SearchCheck,
+  MessageSquareText,
+  ScanLine,
   ShieldCheck,
-  Sparkles,
   X,
-} from 'lucide-react'
-import Seo from '../components/Seo.jsx'
-
-const HERO_IMAGE = '/images/ua-health-hero-dashboard-ua-20260603.png'
-const UA_OG_IMAGE = 'https://ua.vitaloop.today/images/ua-og-preview-20260604.png'
+} from "lucide-react";
+import Seo from "../components/Seo.jsx";
 
 export const CTA_CLASS =
-  'inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-[linear-gradient(135deg,#0f766e_0%,#14b8a6_58%,#d4b483_135%)] px-5 py-3 text-center text-sm font-black leading-tight text-white shadow-[0_14px_34px_rgba(15,118,110,0.24)] transition duration-200 hover:-translate-y-0.5 hover:shadow-[0_18px_42px_rgba(15,118,110,0.32)] focus:outline-none focus-visible:ring-4 focus-visible:ring-[#0f766e]/20 sm:whitespace-nowrap'
-
+  "inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-[#0b9479] px-5 py-3 text-sm font-bold text-white shadow-[0_12px_28px_rgba(11,148,121,.2)] transition hover:-translate-y-0.5 hover:bg-[#087b66]";
 export const NAV_LINKS = [
-  { label: 'Самопочуття', id: 'wellbeing', path: '/samopochuttia' },
-  { label: 'Симптоми', id: 'symptoms', path: '/symptomy' },
-  { label: 'Аналізи', id: 'labs', path: '/analizy' },
-  { label: 'Лабораторії', id: 'laboratories', path: '/laboratorii' },
-  { label: 'Тарифи', id: 'pricing', path: '/tarify' },
-]
-
-const TRUST_CARDS = [
-  { title: 'Приватність даних', body: 'Коротко і без зайвих обіцянок: медична інформація має залишатися приватною.', icon: ShieldCheck },
-  { title: 'Симптоми + аналізи', body: 'Дивимось на стан комплексно, а не на один показник у бланку.', icon: BrainCircuit },
-  { title: 'Для родини', body: 'Зручно вести власні показники й стан близьких.', icon: HeartPulse },
-  { title: 'Зрозуміла мова', body: 'Пояснення без медичного туману і wellness-жаргону.', icon: MessageCircle },
-]
-
-const HERO_PROOFS = [
-  'Почніть із симптомів або аналізів',
-  'Підтримка популярних лабораторних форматів',
-  'Освітній інструмент, не діагноз',
-  'Приватність медичних даних',
-]
-
-const LABS = [
-  { name: 'Synevo', logo: 'S' },
-  { name: 'ДІЛА', logo: 'Д' },
-  { name: 'Smartlab', logo: 'Sm' },
-  { name: 'CSD', logo: 'C' },
-  { name: 'Ескулаб', logo: 'E' },
-]
-
-const SYMPTOM_OPTIONS = [
-  'Втома',
-  'Поганий сон',
-  'Низька енергія',
-  'Випадіння волосся',
-  'Тривожність',
-  'Проблеми з концентрацією',
-  'Часті застуди',
-  'Проблеми у дитини',
-]
-
-const FLOW_STEPS = [
-  { title: 'Опишіть симптоми', body: 'Почніть з того, що реально турбує: сон, енергія, волосся, травлення або стан дитини.', icon: MessageCircle },
-  { title: 'Отримайте напрямки аналізів', body: 'Vitaloop підкаже, які перевірки можуть мати сенс саме для вашої ситуації.', icon: SearchCheck },
-  { title: 'Завантажте результати', body: 'Додайте PDF або фото з лабораторії, щоб побачити показники в одному місці.', icon: FileSearch },
-  { title: 'Отримайте рекомендації', body: 'Сервіс формує персональний план дій, питання до лікаря і що відстежувати далі.', icon: ClipboardList },
-  { title: 'Відстежуйте прогрес', body: 'Порівнюйте самопочуття, показники і повторні перевірки в динаміці.', icon: BarChart3 },
-]
-
-const FAMILY_GROUPS = [
-  { title: 'Для дітей', body: ['феритин', 'вітамін D', 'часті захворювання', 'енергія та розвиток'] },
-  { title: 'Для дорослих', body: ['сон', 'енергія', 'концентрація', 'відновлення'] },
-  { title: 'Для батьків', body: ['зрозумілі пояснення', 'контроль динаміки', 'історія результатів'] },
-]
-
-const PRIORITY_LEVELS = [
-  { title: 'Стабільний стан', tone: 'bg-emerald-100 text-emerald-700', dot: 'bg-emerald-500', body: 'Більшість сигналів не потребують термінової уваги, але динаміку варто зберігати.' },
-  { title: 'Потребує уваги', tone: 'bg-amber-100 text-amber-700', dot: 'bg-amber-500', body: 'Є показники або симптоми, які варто обговорити і перевірити планово.' },
-  { title: 'Пріоритетні напрямки', tone: 'bg-rose-100 text-rose-700', dot: 'bg-rose-500', body: 'Сервіс виділяє, що може бути важливим для наступного медичного кроку.' },
-]
-
-const SCENARIOS = [
-  { title: 'Жінка, 37 років', symptoms: 'втома, слабкість', direction: 'можливий низький феритин', action: 'перевірити залізо, феритин і динаміку самопочуття' },
-  { title: 'Чоловік, 42 роки', symptoms: 'поганий сон, низька енергія', direction: 'можливі фактори: вітамін D, магній, стрес', action: 'підготувати питання до лікаря і список перевірок' },
-  { title: 'Дитина, 8 років', symptoms: 'швидка втомлюваність', direction: 'можливі напрямки: феритин, вітамін D', action: 'структурувати симптоми перед консультацією' },
-]
-
-const RESULT_EXAMPLE = [
-  { label: 'Скарга', value: 'Постійна втома, поганий сон, низька енергія' },
-  { label: 'Можливий пріоритет', value: 'феритин, вітамін D, якість сну та відновлення' },
-  { label: 'Що перевірити', value: 'ЗАК, феритин, 25(OH)D, B12 — без зайвого списку “на все”' },
-  { label: 'Що обговорити з лікарем', value: 'динаміку симптомів, дефіцити, повторну перевірку і безпечний план дій' },
-]
-
-const FAMILY_CHECKS = [
-  'феритин',
-  'вітамін D',
-  'енергія',
-  'концентрація',
-]
-
-const EDUCATION_ARTICLES = [
-  { title: 'Що таке феритин?', path: '/analizy' },
-  { title: 'Чому виникає втома?', path: '/symptomy' },
-  { title: 'Як зрозуміти дефіцит вітаміну D?', path: '/analizy' },
-  { title: 'Причини випадіння волосся', path: '/symptomy' },
-  { title: 'Як покращити сон', path: '/samopochuttia' },
-  { title: 'Аналізи для дітей', path: '/samopochuttia' },
-]
-
+  { label: "Як це працює", id: "how" },
+  { label: "Самопочуття", path: "/samopochuttia" },
+  { label: "Симптоми", path: "/symptomy" },
+  { label: "Аналізи", path: "/analizy" },
+  { label: "База знань", path: "/health-hub" },
+  { label: "Тарифи", path: "/tarify" },
+  { label: "FAQ", path: "/faq" },
+];
 export const PRICING = [
   {
-    name: 'Безкоштовно',
-    price: '0 грн',
-    note: 'для старту',
-    description: 'Перший розбір стану, базові симптоми і короткий підсумок, щоб зрозуміти, з чого почати.',
-    features: ['Оцінка самопочуття', 'Базовий розбір симптомів', '1 активне завантаження аналізів', 'Короткий підсумок'],
-    cta: 'Почати безкоштовно',
-    featured: false,
+    name: "Free",
+    price: "0 грн",
+    note: "для першого кроку",
+    description: "Зберіть симптоми й почніть розуміти, на що звернути увагу.",
+    features: ["Оцінка симптомів", "Базовий підсумок", "1 завантаження бланка"],
+    cta: "Почати безкоштовно",
   },
   {
-    name: 'Premium',
-    price: '399 грн/міс',
-    note: 'для регулярної роботи',
-    description: 'Більше завантажень, динаміка, повніші пояснення і пріоритети для наступних перевірок.',
-    features: ['Більше завантажень аналізів', 'Повний підсумок стану', 'Динаміка показників', 'Пріоритети і питання до лікаря'],
-    cta: 'Спробувати Premium',
+    name: "Premium",
+    price: "249 грн/міс",
+    note: "або 2 499 грн/рік",
+    description:
+      "Для регулярної роботи зі здоровʼям: зберігайте кілька бланків, бачте зміни в динаміці та повертайтеся до зрозумілого плану між консультаціями.",
+    features: [
+      "Кілька завантажень і одна історія результатів",
+      "Розширений звіт: показники, референси та контекст",
+      "Динаміка маркерів і нагадування про наступну перевірку",
+      "Питання до лікаря та структурований підсумок консультації",
+      "Нутриціологічні й lifestyle-рекомендації для обговорення з фахівцем",
+    ],
+    cta: "Спробувати Premium",
     featured: true,
   },
-  {
-    name: 'Family',
-    price: 'Очікується',
-    note: 'для сімейного контролю',
-    description: 'Окремі профілі для близьких, зручна історія показників і зрозумілі підсумки для батьків.',
-    features: ['Профілі членів родини', 'Дитячі сценарії', 'Спільна історія аналізів', 'Нагадування про динаміку'],
-    cta: 'Скоро',
-    featured: false,
-    comingSoon: true,
-  },
-]
+];
 
-const FAQ_ITEMS = [
+const TABS = [
   {
-    question: 'Чи замінює Vitaloop лікаря?',
-    answer: 'Ні. Vitaloop не ставить діагноз і не призначає лікування. Він допомагає структурувати симптоми, аналізи і питання перед консультацією.',
+    id: "fatigue",
+    label: "Втома",
+    image: "/images/cabinet/results.png",
+    title: "Втома — не один показник",
+    text: "Розглядайте симптоми, феритин, гемоглобін та інші результати разом, а не як ізольовані цифри.",
+    note: "Позначаємо, на що звернути увагу, і допомагаємо сформулювати запитання для лікаря.",
   },
   {
-    question: 'Можна почати без аналізів?',
-    answer: 'Так. Почніть із симптомів і самопочуття. Аналізи можна додати пізніше, коли буде зрозуміло, що саме варто перевірити.',
+    id: "after",
+    label: "Після бланка",
+    image: "/images/cabinet/report.png",
+    title: "Бланк перетворюється на розмову",
+    text: "Замість списку цифр — структурований підсумок: що виділяється та які питання зберегти до консультації.",
+    note: "Без діагнозів та самостійних призначень — тільки підготовлена інформація для консультації.",
   },
   {
-    question: 'Чи це тільки для дорослих?',
-    answer: 'Ні. Vitaloop можна використовувати для сімейного контролю стану, але будь-які дитячі питання потрібно обговорювати з педіатром.',
+    id: "progress",
+    label: "Динаміка",
+    image: "/images/cabinet/dashboard.png",
+    title: "Бачте зміни, а не окремий день",
+    text: "Порівнюйте наступні результати зі збереженим контекстом самопочуття й попередніми файлами.",
+    note: "Дата наступної перевірки зберігається поруч із результатом.",
   },
-  {
-    question: 'Чи є лабораторії партнерами?',
-    answer: 'Поки ми говоримо про підтримку форматів результатів з популярних лабораторій України. Партнерства будемо позначати окремо.',
-  },
-  {
-    question: 'Що таке індекс пріоритетів?',
-    answer: 'Це внутрішній індикатор Vitaloop, який допомагає побачити, які напрямки потребують уваги. Це не діагноз і не медичний висновок.',
-  },
-  {
-    question: 'Що входить у Premium?',
-    answer: 'Більше завантажень аналізів, повніший підсумок, динаміка стану, пріоритети і питання до лікаря.',
-  },
-]
-
-const SCHEMA_FAQ = {
-  '@context': 'https://schema.org',
-  '@type': 'FAQPage',
-  mainEntity: FAQ_ITEMS.map((item) => ({
-    '@type': 'Question',
-    name: item.question,
-    acceptedAnswer: { '@type': 'Answer', text: item.answer },
-  })),
-}
-
-const SCHEMA_SOFTWARE = {
-  '@context': 'https://schema.org',
-  '@type': 'SoftwareApplication',
-  name: 'Vitaloop Ukraine',
-  applicationCategory: 'HealthApplication',
-  operatingSystem: 'Web',
-  url: 'https://ua.vitaloop.today/',
-  inLanguage: 'uk-UA',
-  description: 'Vitaloop допомагає почати з симптомів, зрозуміти можливі причини, підібрати доречні аналізи і сформувати персональний план дій.',
-  offers: [
-    { '@type': 'Offer', name: 'Free', price: '0', priceCurrency: 'UAH' },
-    { '@type': 'Offer', name: 'Premium', price: '399', priceCurrency: 'UAH' },
+];
+const TRUST = [
+  [FileImage, "PDF · фото · скан", "Завантажте бланк так, як зручно вам."],
+  [ScanLine, "Симптоми + аналізи", "Поєднані в один зрозумілий контекст."],
+  [
+    MessageSquareText,
+    "Питання до лікаря",
+    "Без самодіагностики та зайвих висновків.",
   ],
-}
-
-const SCHEMA_ORGANIZATION = {
-  '@context': 'https://schema.org',
-  '@type': 'Organization',
-  name: 'VITALOOP Ukraine',
-  url: 'https://ua.vitaloop.today/',
-  areaServed: 'UA',
-  knowsLanguage: ['uk-UA'],
-  description: 'Український напрям Vitaloop з фокусом на симптоми, сімейне здоровʼя, лабораторні показники і зрозумілі рішення.',
-}
-
-export function getUaPath(path = '/') {
-  if (typeof window === 'undefined') return path
-  const normalizedPath = path === '/' ? '' : path
-  const isUaHost = window.location.hostname.toLowerCase() === 'ua.vitaloop.today'
-  return isUaHost ? path : `/ua${normalizedPath}`
-}
+  [
+    ShieldCheck,
+    "Ваші дані — ваші",
+    "Конфіденційно й з повагою до приватності.",
+  ],
+];
+const LANDING_SYMPTOMS = [
+  "Втома",
+  "Поганий сон",
+  "Низька енергія",
+  "Випадіння волосся",
+  "Тривожність",
+  "Концентрація",
+  "Травлення",
+  "Часті застуди",
+];
+const STEPS = [
+  [
+    "01",
+    "Почніть із себе",
+    "Позначте, що турбує: сон, енергія, волосся, концентрація або відновлення.",
+    "Це формує контекст, а не «оцінку здоров’я».",
+  ],
+  [
+    "02",
+    "Додайте бланк",
+    "Завантажте PDF, фото або скан із Сінево, ДІЛА, Ескулаб чи іншої лабораторії.",
+    "Не потрібно вручну переносити показники.",
+  ],
+  [
+    "03",
+    "Розберіть результат",
+    "Побачте, що виділяється, що доречно обговорити та чого може бракувати для контексту.",
+    "Зрозумілою мовою й без призначень.",
+  ],
+  [
+    "04",
+    "Поверніться до динаміки",
+    "Додайте наступний бланк і порівняйте зміни разом із самопочуттям.",
+    "Зберігайте історію важливого в одному місці.",
+  ],
+];
+const SCENARIOS = [
+  [
+    "01",
+    "Втома, волосся, цикл",
+    "Коли енергії менше, а причин може бути багато.",
+    "Зберіть симптоми та результати в один структурований запит до лікаря.",
+    "/health-hub/volossia-ta-analizy",
+  ],
+  [
+    "02",
+    "Після Сінево або ДІЛА",
+    "Коли PDF вже в телефоні, але відповідей у ньому немає.",
+    "Завантажте файл і перетворіть його на зрозумілий підсумок та питання.",
+    "/analizy",
+  ],
+  [
+    "03",
+    "Два бланки — одна динаміка",
+    "Коли важлива не одна дата, а напрям змін.",
+    "Порівнюйте результати обережно — без небезпечних ярликів і самодіагностики.",
+    "/health-hub",
+  ],
+];
+const FAQ_ITEMS = [
+  [
+    "Чи замінює Vitaloop лікаря?",
+    "Ні, Vitaloop не замінює лікаря, не встановлює діагноз і не призначає лікування. Сервіс допомагає зібрати симптоми, результати аналізів і попередні вимірювання в одному місці. Так легше побачити, які дані варто взяти на консультацію. У звіті можна знайти нейтральні пояснення показників та питання для обговорення. Клінічну оцінку, рішення щодо обстежень і лікування приймає кваліфікований лікар. Якщо стан погіршується або є гострі симптоми, звертайтеся по медичну допомогу без зволікань.",
+  ],
+  [
+    "Чи можна почати без аналізів?",
+    "Так, почати можна без готового бланка аналізів. Опишіть те, що турбує: зміни енергії, сну, концентрації, настрою або відновлення. Це дозволяє зібрати вихідні дані без медичних термінів. Коли результати лабораторії будуть під рукою, їх можна додати до того самого профілю. Так симптоми й показники залишаться поруч, а не в різних чатах і папках. Vitaloop не підбирає лікування, але допомагає підготувати зрозумілі питання до консультації.",
+  ],
+  [
+    "Які файли можна завантажити?",
+    "Ви можете додати PDF, фото або скан лабораторного бланка. Для коректного прочитання на зображенні мають бути видимі назви показників, значення, одиниці вимірювання та референсні межі лабораторії. Підійдуть результати з популярних українських лабораторій, зокрема Сінево, ДІЛА, Ескулаб, SmartLab, CSD та інших. Чітке фото без обрізаних полів допомагає уникнути помилок у назвах і числах. Якщо певної інформації бракує, сервіс може показати, що саме варто уточнити. Дані з бланка залишаються у вашому профілі для подальшого порівняння.",
+  ],
+  [
+    "Чи є перелічені лабораторії партнерами Vitaloop?",
+    "Перелік лабораторій на сторінці означає приклади поширених форматів бланків, а не підтверджене партнерство. Ми не заявляємо про співпрацю, якщо її немає. Офіційні партнерства, якщо вони з’являться, будуть позначені окремо. Ви можете додати бланк іншої лабораторії, якщо на ньому видно назви показників, значення, одиниці та референси. Доступність розпізнавання окремих форматів може залежати від якості файлу. Перед завантаженням перевірте, що фото не розмите й не обрізане.",
+  ],
+  [
+    "Як Vitaloop працює з моїми даними?",
+    "Результати аналізів і відповіді про самопочуття зберігаються у вашому профілі, щоб їх можна було переглянути та порівняти пізніше. Доступ до профілю захищений обліковим записом. У налаштуваннях доступні дії для керування профілем і даними. Детальні умови обробки даних описані в Політиці приватності. Не завантажуйте чужі медичні документи без законної підстави та дозволу людини. Якщо потрібне видалення даних або виникли запитання, зверніться через контакти внизу сторінки.",
+  ],
+];
+const FAQ_SCHEMA = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: FAQ_ITEMS.map(([question, answer]) => ({
+    "@type": "Question",
+    name: question,
+    acceptedAnswer: { "@type": "Answer", text: answer },
+  })),
+};
 
 function scrollTo(id) {
-  document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  document
+    .getElementById(id)
+    ?.scrollIntoView({ behavior: "smooth", block: "start" });
 }
-
-export function UaFlag() {
-  return (
-    <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-[#e5dfd6] bg-white text-[17px] shadow-sm sm:h-7 sm:w-7 sm:text-[15px]" aria-label="Україна">
-      🇺🇦
-    </span>
-  )
+export function getUaPath(path = "/") {
+  if (typeof window === "undefined") return path;
+  return window.location.hostname === "ua.vitaloop.today"
+    ? path
+    : `/ua${path === "/" ? "" : path}`;
 }
-
 export function UaBrandMark() {
   return (
-    <span className="inline-flex h-10 items-center gap-1.5 sm:h-11 sm:gap-2">
-      <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-[11px] bg-white sm:h-9 sm:w-9 sm:rounded-[12px]">
-        <img src="/images/ua-vitaloop-mark-20260603.png" alt="" className="h-[30px] w-[30px] object-contain sm:h-8 sm:w-8" />
-      </span>
-      <span className="text-[19px] font-black uppercase leading-none tracking-[0.02em] sm:text-[22px]" aria-label="VITALOOP">
-        <span className="text-[#1f6ed4]">VITA</span>
-        <span className="text-[#f4c542]">LOOP</span>
-      </span>
+    <span className="inline-flex items-center gap-3">
+      <img
+        src="/images/favicon_1.png"
+        alt=""
+        className="h-10 w-10 object-contain"
+      />
+      <b className="text-[21px] font-black uppercase leading-none tracking-[.02em]">
+        <span className="text-[#10343a]">VITA</span>
+        <span className="text-[#087f78]">LOOP</span>
+      </b>
     </span>
-  )
+  );
+}
+export function UaFlag() {
+  return null;
+}
+function Eyebrow({ children }) {
+  return (
+    <p className="text-xs font-bold uppercase tracking-[.15em] text-[#0b9479]">
+      {children}
+    </p>
+  );
+}
+function Heading({ children, className = "" }) {
+  return (
+    <h2
+      className={`mt-3 text-[34px] font-bold leading-[1.07] tracking-[-.04em] text-[#10233f] sm:text-[48px] ${className}`}
+    >
+      {children}
+    </h2>
+  );
+}
+function BrowserFrame({ children, className = "" }) {
+  return (
+    <div
+      className={`overflow-hidden rounded-[22px] border border-[#d6e0e1] bg-white shadow-[0_26px_70px_rgba(16,35,63,.14)] ${className}`}
+    >
+      <div className="flex h-9 items-center gap-1.5 border-b border-[#e7eeee] bg-[#f8fbfb] px-4">
+        <i className="h-2 w-2 rounded-full bg-[#f4c542]" />
+        <i className="h-2 w-2 rounded-full bg-[#9bd8c9]" />
+        <i className="h-2 w-2 rounded-full bg-[#c9d4dc]" />
+      </div>
+      {children}
+    </div>
+  );
 }
 
 export function UaHeader() {
-  const [open, setOpen] = useState(false)
-  const navigate = useNavigate()
-
-  const openPage = (path) => {
-    setOpen(false)
-    navigate(getUaPath(path))
-  }
-
+  const [open, setOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const navigate = useNavigate();
+  useEffect(() => {
+    const updateHeader = () => setScrolled(window.scrollY > 12);
+    updateHeader();
+    window.addEventListener("scroll", updateHeader, { passive: true });
+    return () => window.removeEventListener("scroll", updateHeader);
+  }, []);
+  const go = (link) => {
+    setOpen(false);
+    if (link.id) {
+      navigate(getUaPath("/"));
+      setTimeout(() => scrollTo(link.id), 50);
+    } else if (link.href) window.location.assign(link.href);
+    else navigate(getUaPath(link.path));
+  };
   return (
-    <header className="sticky top-0 z-40 border-b border-[#e5dfd6] bg-white/95 shadow-[0_10px_30px_rgba(15,23,42,0.06)] backdrop-blur-xl">
-      <div className="mx-auto flex h-[60px] w-full max-w-[1200px] items-center justify-between px-4 sm:h-[68px] sm:px-6">
-        <button onClick={() => navigate(getUaPath('/'))} className="flex h-11 items-center gap-1.5 rounded-full pr-1 sm:gap-2" aria-label="Vitaloop Україна">
+    <header
+      className={`sticky top-0 z-50 border-b border-[#dce5e5]/80 transition-[background-color,box-shadow] duration-300 ${scrolled ? "bg-[#fffcf7]/70 shadow-[0_8px_24px_rgba(16,35,63,.06)] backdrop-blur-xl" : "bg-[#fffcf7]"}`}
+    >
+      <div className="mx-auto flex h-[70px] max-w-[1220px] items-center justify-between px-5 sm:px-8">
+        <button
+          onClick={() => navigate(getUaPath("/"))}
+          aria-label="На головну"
+        >
           <UaBrandMark />
-          <UaFlag />
         </button>
-
-        <nav className="hidden items-center gap-1 md:flex">
+        <nav className="hidden items-center gap-4 xl:gap-5 lg:flex">
           {NAV_LINKS.map((link) => (
             <button
-              key={link.id}
-              onClick={() => openPage(link.path)}
-              className="rounded-full px-3.5 py-2 text-sm font-semibold text-[#4b5563] transition duration-200 hover:bg-[#f1fbf8] hover:text-[#0f766e]"
+              key={link.label}
+              onClick={() => go(link)}
+              className="text-sm font-medium tracking-[-.01em] text-[#526273] transition hover:text-[#0b9479]"
             >
               {link.label}
             </button>
           ))}
         </nav>
-
-        <div className="hidden items-center gap-2 md:flex">
+        <div className="hidden items-center gap-2 lg:flex">
           <button
-            onClick={() => navigate('/login')}
-            className="rounded-full px-4 py-2 text-sm font-semibold text-[#4b5563] transition duration-200 hover:bg-[#f1fbf8] hover:text-[#0f766e]"
+            onClick={() => navigate("/login")}
+            className="inline-flex h-10 items-center rounded-full border border-[#dce5e5] bg-white px-4 text-sm font-semibold text-[#526273] transition hover:border-[#0b9479]/40 hover:text-[#0b9479]"
           >
-            Увійти
+            Вхід
           </button>
-          <button onClick={() => navigate('/login?signup=true')} className={CTA_CLASS}>
-            Почати
-            <ArrowRight className="h-4 w-4" />
+          <button
+            className="inline-flex h-10 items-center rounded-full bg-[#0b9479] px-4 text-sm font-semibold text-white shadow-[0_8px_18px_rgba(11,148,121,.18)] transition hover:-translate-y-0.5 hover:bg-[#087b66]"
+            onClick={() => navigate("/login?signup=true")}
+          >
+            Реєстрація
           </button>
         </div>
-
         <button
-          onClick={() => setOpen((value) => !value)}
-          className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[#e5dfd6] bg-white text-[#0f172a] shadow-sm transition hover:bg-[#f1fbf8] md:hidden"
+          className="grid h-10 w-10 place-items-center lg:hidden"
+          onClick={() => setOpen(!open)}
           aria-label="Відкрити меню"
         >
-          {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          {open ? <X /> : <Menu />}
         </button>
       </div>
-
       {open && (
-        <div className="border-t border-[#e5dfd6] bg-white md:hidden">
-          <div className="mx-auto grid max-w-[1200px] gap-1 px-4 py-4">
-            {NAV_LINKS.map((link) => (
-              <button
-                key={link.id}
-                onClick={() => openPage(link.path)}
-                className="rounded-xl px-3 py-3 text-left text-sm font-semibold text-[#4b5563] transition hover:bg-[#f1fbf8] hover:text-[#0f766e]"
-              >
-                {link.label}
-              </button>
-            ))}
-            <button onClick={() => navigate('/login?signup=true')} className={`${CTA_CLASS} mt-2 w-full`}>
-              Отримати персональну оцінку
+        <div className="border-t border-[#dce5e5] bg-[#fffcf7] px-5 py-4 lg:hidden">
+          {NAV_LINKS.map((link) => (
+            <button
+              key={link.label}
+              onClick={() => go(link)}
+              className="block w-full py-3 text-left text-sm font-medium text-[#526273]"
+            >
+              {link.label}
             </button>
-          </div>
+          ))}
+          <button
+            className="mt-2 inline-flex min-h-12 w-full items-center justify-center rounded-full border border-[#dce5e5] bg-white px-5 text-sm font-semibold text-[#526273] transition hover:border-[#0b9479]/40 hover:text-[#0b9479]"
+            onClick={() => navigate("/login")}
+          >
+            Вхід
+          </button>
+          <button
+            className={`${CTA_CLASS} mt-2 w-full`}
+            onClick={() => navigate("/login?signup=true")}
+          >
+            Реєстрація
+          </button>
         </div>
       )}
     </header>
-  )
+  );
 }
-
 export function UaFooter() {
-  const navigate = useNavigate()
-
-  return (
-    <footer className="border-t border-[#e5dfd6] bg-white">
-      <div className="mx-auto grid w-full max-w-[1200px] gap-8 px-4 py-10 sm:px-6 md:grid-cols-[1.1fr_0.9fr_0.9fr]">
-        <div>
-          <button onClick={() => navigate(getUaPath('/'))} className="flex items-center gap-2" aria-label="Vitaloop Україна">
-            <UaBrandMark />
-            <UaFlag />
+  const navigate = useNavigate();
+  const column = (title, items) => (
+    <div>
+      <p className="text-xs font-bold uppercase tracking-[.14em] text-[#8fe0cc]">
+        {title}
+      </p>
+      <div className="mt-4 grid gap-2 text-sm text-[#c2ced9]">
+        {items.map(([label, action]) => (
+          <button
+            key={label}
+            onClick={action}
+            className="w-fit text-left transition hover:text-[#8fe0cc]"
+          >
+            {label}
           </button>
-          <p className="mt-4 max-w-md text-sm leading-7 text-[#4b5563]">
-            VITALOOP Ukraine допомагає почати з симптомів, зрозуміти можливі причини і рухатися до кращих рішень щодо здоровʼя.
+        ))}
+      </div>
+    </div>
+  );
+  return (
+    <footer className="bg-[#10233f] pb-[76px] text-white lg:pb-0">
+      <div className="mx-auto grid max-w-[1220px] gap-x-8 gap-y-10 px-5 py-14 sm:px-8 sm:grid-cols-2 lg:grid-cols-[1.35fr_repeat(3,.85fr)]">
+        <div>
+          <button
+            onClick={() => navigate(getUaPath("/"))}
+            className="inline-flex items-center gap-3"
+          >
+            <span className="grid h-11 w-11 place-items-center rounded-xl bg-white/10 ring-1 ring-white/20">
+              <img
+                src="/images/favicon_1.png"
+                alt=""
+                className="h-8 w-8 object-contain"
+              />
+            </span>
+            <b className="text-[21px] font-black tracking-[.02em] text-white">
+              VITALOOP
+            </b>
+          </button>
+          <p className="mt-5 max-w-sm text-sm leading-6 text-[#c2ced9]">
+            VITALOOP поєднує симптоми, лабораторні результати та динаміку в
+            підготовлений наступний крок.
           </p>
-          <div className="mt-5 rounded-[22px] border border-[#e5dfd6] bg-[#f8f5f0] p-4">
-            <p className="text-sm font-black text-[#0f172a]">Українська екосистема здоровʼя</p>
-            <p className="mt-1 text-sm leading-6 text-[#4b5563]">
-              Локальні лабораторії, спеціалісти й сервіси мають бути першими в наших партнерствах, коли це чесно для користувача.
+          <div className="mt-5 grid gap-1 text-sm leading-6 text-[#c2ced9]">
+            <a
+              href="mailto:info@softdab.tech"
+              className="font-semibold text-[#8fe0cc]"
+            >
+              info@softdab.tech
+            </a>
+            <a href="tel:+380663790819">+380 66 379 08 19</a>
+            <p>
+              вул. Новоселицька, 7,
+              <br />
+              м. Київ, Україна
             </p>
           </div>
         </div>
-
-        <div>
-          <p className="text-sm font-black uppercase tracking-[0.14em] text-[#0f766e]">Сторінки</p>
-          <div className="mt-4 grid gap-2">
-            {NAV_LINKS.map((link) => (
-              <button key={link.id} onClick={() => navigate(getUaPath(link.path))} className="w-fit text-left text-sm font-semibold text-[#4b5563] transition hover:text-[#0f766e]">
-                {link.label}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <div>
-          <p className="text-sm font-black uppercase tracking-[0.14em] text-[#0f766e]">Важливо</p>
-          <p className="mt-4 text-sm leading-7 text-[#4b5563]">
-            Vitaloop не ставить діагноз, не призначає лікування і не замінює лікаря. Це освітній інструмент для кращого розуміння стану.
-          </p>
-          <p className="mt-5 text-xs font-semibold text-[#6b7280]">© 2026 VITALOOP Ukraine 🇺🇦</p>
-        </div>
+        {column("Сторінки", [
+          ["Як це працює", () => scrollTo("how")],
+          ["Симптоми", () => navigate(getUaPath("/symptomy"))],
+          ["Аналізи", () => navigate(getUaPath("/analizy"))],
+          ["База знань", () => navigate(getUaPath("/health-hub"))],
+          ["Тарифи", () => navigate(getUaPath("/tarify"))],
+          ["FAQ", () => navigate(getUaPath("/faq"))],
+        ])}
+        {column("Матеріали", [
+          ["Самопочуття", () => navigate(getUaPath("/samopochuttia"))],
+          ["Симптоми", () => navigate(getUaPath("/symptomy"))],
+          ["Аналізи", () => navigate(getUaPath("/analizy"))],
+          ["Лабораторії", () => navigate(getUaPath("/laboratorii"))],
+        ])}
+        {column("Документи", [
+          ["Умови користування", () => navigate(getUaPath("/terms"))],
+          ["Повернення коштів", () => navigate(getUaPath("/refund-policy"))],
+          ["Приватність", () => navigate(getUaPath("/privacy-policy"))],
+          ["Контакти", () => navigate(getUaPath("/contact"))],
+        ])}
+      </div>
+      <div className="mx-auto flex max-w-[1220px] flex-col gap-3 border-t border-white/10 px-5 py-6 text-xs text-[#91a0ae] sm:flex-row sm:items-center sm:justify-between sm:px-8">
+        <p>© 2026 VITALOOP Ukraine. Усі права захищені.</p>
+        <p>
+          Зроблено з <span className="text-red-400">♥</span> SoftDAB ·
+          softdab.tech
+        </p>
       </div>
     </footer>
-  )
-}
-
-function SectionHeading({ eyebrow, title, body, center = false }) {
-  return (
-    <div className={center ? 'mx-auto max-w-3xl text-center' : 'max-w-3xl'}>
-      {eyebrow && <p className="text-xs font-black uppercase tracking-[0.14em] text-[#0f766e] sm:text-sm">{eyebrow}</p>}
-      <h2 className="mt-3 text-[28px] font-black leading-[1.12] tracking-tight text-[#0f172a] sm:text-[40px] md:text-[48px]">
-        {title}
-      </h2>
-      {body && <p className="mt-4 text-[15px] leading-7 text-[#4b5563] sm:text-base sm:leading-8">{body}</p>}
-    </div>
-  )
+  );
 }
 
 export default function UaLanding() {
-  const navigate = useNavigate()
-  const [selectedSymptoms, setSelectedSymptoms] = useState(['Втома', 'Поганий сон'])
-
-  const startSignup = () => navigate('/login?signup=true')
-  const goPage = (path) => navigate(getUaPath(path))
-  const toggleSymptom = (symptom) => {
+  const navigate = useNavigate();
+  const [activeId, setActiveId] = useState("fatigue");
+  const [billing, setBilling] = useState("month");
+  const [selectedSymptoms, setSelectedSymptoms] = useState([]);
+  const active = TABS.find((tab) => tab.id === activeId);
+  const signup = () => navigate("/login?signup=true");
+  const startSymptoms = () => {
+    window.sessionStorage.setItem(
+      "vitaloop-intake-symptoms",
+      JSON.stringify(selectedSymptoms),
+    );
+    navigate("/login?signup=true&returnUrl=/questionnaire");
+  };
+  const symptomsCta = selectedSymptoms.length
+    ? `Продовжити з ${selectedSymptoms.length} ${selectedSymptoms.length === 1 ? "симптомом" : "симптомами"}`
+    : "Пройти оцінку";
+  const toggleSymptom = (symptom) =>
     setSelectedSymptoms((current) =>
-      current.includes(symptom) ? current.filter((item) => item !== symptom) : [...current, symptom],
-    )
-  }
-
+      current.includes(symptom)
+        ? current.filter((item) => item !== symptom)
+        : [...current, symptom],
+    );
   return (
-    <div id="top" className="min-h-screen bg-[#f8f5f0] text-[#0f172a]">
+    <div className="min-h-screen bg-[#fffcf7] text-[#10233f]">
       <Seo
-        title="Vitaloop Ukraine — персональна оцінка симптомів і аналізів"
-        description="Постійна втома, поганий сон чи низька енергія? Vitaloop допоможе знайти можливі причини, пріоритети аналізів і персональний план дій."
+        title="VITALOOP — пояснення аналізів і симптомів українською"
+        description="Завантажте PDF, фото або скан аналізів. VITALOOP допомагає зібрати симптоми, результати лабораторії та питання для розмови з лікарем."
         canonicalUrl="https://ua.vitaloop.today/"
         locale="uk_UA"
-        image={UA_OG_IMAGE}
-        imageAlt="Vitaloop Ukraine — персональна оцінка симптомів, аналізів і плану дій"
-        schemas={[SCHEMA_SOFTWARE, SCHEMA_ORGANIZATION, SCHEMA_FAQ]}
+        image="https://ua.vitaloop.today/images/ua-og-preview-20260604.png"
+        imageAlt="Vitaloop Ukraine"
+        structuredData={FAQ_SCHEMA}
       />
       <UaHeader />
-
       <main>
-        <section className="relative overflow-hidden border-b border-[#e5dfd6] bg-[#f8f5f0]">
-          <img src={HERO_IMAGE} alt="" className="absolute inset-0 h-full w-full object-cover object-[57%_center] opacity-90 sm:object-center" />
-          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(248,245,240,0.20)_0%,rgba(248,245,240,0.48)_58%,rgba(248,245,240,0.96)_100%)] sm:bg-[linear-gradient(90deg,rgba(248,245,240,0.98)_0%,rgba(248,245,240,0.90)_42%,rgba(248,245,240,0.30)_78%,rgba(248,245,240,0.08)_100%)]" />
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_20%,rgba(255,255,255,0.62),transparent_32%)]" />
-
-          <div className="relative mx-auto flex min-h-[690px] w-full max-w-[1200px] items-start px-4 pb-8 pt-[112px] sm:min-h-[calc(100svh-68px)] sm:items-center sm:px-6 sm:py-16">
-            <div className="max-w-2xl rounded-[32px] border border-white/80 bg-white/74 p-5 shadow-[0_24px_70px_rgba(15,23,42,0.12)] backdrop-blur-xl sm:border-0 sm:bg-transparent sm:p-0 sm:shadow-none sm:backdrop-blur-0">
-              <div className="inline-flex max-w-full items-center gap-2 rounded-full border border-[#e5dfd6] bg-white/88 px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.10em] text-[#0f766e] shadow-sm sm:text-xs">
-                <Sparkles className="h-3.5 w-3.5 shrink-0 text-[#14b8a6]" />
-                Симптоми · причини · план дій
+        <section className="relative overflow-hidden bg-[#f8fbfa]">
+          <img
+            src="/images/ua-health-hero-ukraine-2026.png"
+            alt=""
+            className="absolute inset-0 h-full w-full object-cover object-center opacity-[.32] mix-blend-multiply"
+          />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_88%_18%,#d8f0ea_0,transparent_28%),radial-gradient(ellipse_at_8%_100%,#f7e3a8_0,transparent_32%)]" />
+          <div className="absolute bottom-0 left-0 right-0 h-2 bg-[#f4c542]/65" />
+          <div className="relative mx-auto grid min-h-[690px] max-w-[1220px] gap-8 px-5 pb-12 pt-16 sm:px-8 lg:grid-cols-[.92fr_1.08fr] lg:items-center lg:py-20">
+            <div className="max-w-[600px]">
+              <div className="inline-flex items-center gap-2 rounded-full border border-[#cde9df] bg-white/80 px-3 py-1.5 text-xs font-semibold text-[#087b66]">
+                <span className="h-1.5 w-1.5 rounded-full bg-[#f4c542]" />
+                Для українських бланків аналізів
               </div>
-              <h1 className="mt-5 max-w-[680px] text-[34px] font-black leading-[1.05] tracking-tight text-[#0f172a] sm:mt-6 sm:text-[52px] lg:text-[66px]">
-                Постійна втома? Поганий сон? Низька енергія?
+              <h1 className="mt-6 text-[46px] font-bold leading-[.98] tracking-[-.055em] sm:text-[68px]">
+                Зрозумійте аналізи.
+                <br />
+                <span className="text-[#0b9479]">Не залишайтеся</span>
+                <br />з бланком наодинці.
               </h1>
-              <p className="mt-5 max-w-xl text-[16px] leading-7 text-[#334155] sm:text-lg sm:leading-8">
-                Знайдіть можливу причину та отримайте персональний план дій. Почніть із симптомів або завантажте аналізи, якщо вони вже є.
+              <p className="mt-6 max-w-lg text-[17px] leading-8 text-[#526273]">
+                VITALOOP поєднує симптоми, результати лабораторії та динаміку —
+                щоб ви прийшли до лікаря з підготовленими питаннями.
               </p>
-              <div className="mt-7 flex flex-col gap-3 sm:flex-row">
-                <button onClick={startSignup} className={`${CTA_CLASS} w-full sm:w-auto`}>
-                  <span>Отримати персональну оцінку</span>
-                  <ArrowRight className="h-4 w-4" />
+              <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+                <button onClick={signup} className={CTA_CLASS}>
+                  Почати з бланка <ArrowRight className="h-4 w-4" />
                 </button>
                 <button
-                  onClick={() => scrollTo('result-example')}
-                  className="inline-flex min-h-11 w-full items-center justify-center rounded-full border border-[#e5dfd6] bg-white px-5 py-3 text-center text-sm font-black leading-tight text-[#0f172a] shadow-sm transition hover:-translate-y-0.5 hover:border-[#14b8a6]/45 hover:text-[#0f766e] sm:w-auto sm:whitespace-nowrap"
+                  onClick={startSymptoms}
+                  className="inline-flex min-h-12 items-center gap-2 px-3 text-sm font-bold text-[#0b9479]"
                 >
-                  Переглянути приклад
+                  Пройти оцінку самопочуття <ArrowRight className="h-4 w-4" />
                 </button>
               </div>
-            </div>
-          </div>
-        </section>
-
-        <section id="trust" className="bg-white py-10 sm:py-12">
-          <div className="mx-auto w-full max-w-[1200px] px-4 sm:px-6">
-            <div className="grid gap-6 border-y border-[#e5dfd6] py-6 md:grid-cols-[1.2fr_1fr] md:items-center">
-              <p className="max-w-2xl text-lg font-black leading-8 text-[#0f172a]">
-                VITALOOP збирає симптоми, аналізи й динаміку в одну зрозумілу картину. Без діагнозів, без гучних обіцянок, без медичного туману.
+              <p className="mt-5 max-w-md text-xs leading-5 text-[#687789]">
+                Освітній інструмент, не діагноз. Медичні рішення — разом із
+                лікарем.
               </p>
-              <div className="grid grid-cols-2 gap-x-6 gap-y-3 text-sm font-bold text-[#4b5563] sm:grid-cols-4 md:grid-cols-2">
-                <span>Приватність даних</span>
-                <span>Симптоми + аналізи</span>
-                <span>Для всієї родини</span>
-                <span>Українські формати</span>
+            </div>
+            <div className="relative mx-auto w-full max-w-[610px] lg:justify-self-end">
+              <div className="absolute -right-8 top-14 hidden h-32 w-32 rounded-full border border-[#9bd8c9] lg:block" />
+              <div className="absolute -left-8 bottom-10 h-24 w-24 rounded-full bg-[#f4c542]/30" />
+              <img
+                src="/images/cabinet/dashboard.png"
+                alt="Приклад кабінету Vitaloop: результати та динаміка"
+                className="relative z-10 mx-auto w-full drop-shadow-[0_28px_30px_rgba(16,35,63,.18)]"
+              />
+              <div className="absolute bottom-8 left-0 z-20 rounded-2xl border border-white bg-white/95 p-4 shadow-xl sm:-left-5">
+                <p className="text-xs font-bold text-[#526273]">
+                  Наступний крок
+                </p>
+                <p className="mt-1 text-sm font-bold">
+                  Феритин: повторити
+                  <br />
+                  через 6–12 тижнів
+                </p>
+                <p className="mt-2 max-w-[190px] text-[10px] leading-4 text-[#687789]">
+                  Демонстраційний приклад. Терміни повторної перевірки
+                  узгоджують із лікарем.
+                </p>
               </div>
             </div>
           </div>
         </section>
-
-        <section id="wellbeing" className="mx-auto grid w-full max-w-[1200px] gap-10 px-4 py-14 sm:px-6 sm:py-20 lg:grid-cols-[0.82fr_1.18fr] lg:items-start">
-          <div>
-            <SectionHeading
-              eyebrow="Короткий тест"
-              title="Що вас турбує?"
-              body="Оберіть кілька сигналів. Vitaloop покаже, які напрямки варто розглянути першими і що може бути повʼязано між собою."
-            />
-            <button onClick={startSignup} className={`${CTA_CLASS} mt-7 w-full sm:w-auto`}>
-              Побачити мої пріоритети
-              <ArrowRight className="h-4 w-4" />
-            </button>
-          </div>
-
-          <div className="rounded-[30px] bg-white/78 p-4 shadow-[0_24px_70px_rgba(15,23,42,0.08)] ring-1 ring-[#e5dfd6] backdrop-blur sm:p-5">
-            <div className="flex items-center justify-between gap-4 border-b border-[#e5dfd6] pb-4">
-              <p className="text-sm font-black text-[#0f172a]">Обрано: {selectedSymptoms.length} симптоми</p>
-              <p className="text-xs font-bold text-[#6b7280]">1 хвилина</p>
-            </div>
-            <div className="mt-4 grid gap-3 sm:grid-cols-2">
-              {SYMPTOM_OPTIONS.map((symptom) => {
-                const active = selectedSymptoms.includes(symptom)
-                return (
-                  <button
-                    key={symptom}
-                    onClick={() => toggleSymptom(symptom)}
-                    className={`flex items-center gap-3 rounded-[18px] px-4 py-3 text-left text-sm font-black transition hover:-translate-y-0.5 ${active ? 'bg-[#0f766e] text-white shadow-[0_12px_30px_rgba(15,118,110,0.22)]' : 'bg-[#f8f5f0] text-[#0f172a] hover:bg-white hover:text-[#0f766e]'}`}
-                  >
-                    <span className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-md border ${active ? 'border-white/70 bg-white text-[#0f766e]' : 'border-[#d6d0c7] bg-white text-transparent'}`}>
-                      <Check className="h-3.5 w-3.5" />
-                    </span>
-                    {symptom}
-                  </button>
-                )
-              })}
-            </div>
-            <div className="mt-5 rounded-[22px] bg-[#f8f5f0] p-4 text-sm leading-6 text-[#4b5563]">
-              <span className="font-black text-[#0f172a]">Попередній фокус:</span>{' '}
-              {selectedSymptoms.length ? selectedSymptoms.join(', ') : 'оберіть симптоми'} → можливі пріоритети для перевірки.
-            </div>
-          </div>
-        </section>
-
-        <section id="how" className="bg-white py-14 sm:py-20">
-          <div className="mx-auto w-full max-w-[1200px] px-4 sm:px-6">
-            <SectionHeading center eyebrow="Як це працює" title="Від скарг до плану дій" />
-            <div className="mt-12 grid gap-8 md:grid-cols-5">
-              {FLOW_STEPS.map((item, index) => {
-                const Icon = item.icon
-                return (
-                  <button
-                    key={item.title}
-                    onClick={() => goPage(index === 2 ? '/analizy' : index === 1 ? '/symptomy' : '/samopochuttia')}
-                    className="group relative text-left"
-                  >
-                    <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#f1fbf8] text-[#0f766e] transition group-hover:-translate-y-0.5 group-hover:bg-[#0f766e] group-hover:text-white">
-                      <Icon className="h-5 w-5" />
-                    </span>
-                    <span className="mt-5 block text-xs font-black uppercase tracking-[0.14em] text-[#6b7280]">0{index + 1}</span>
-                    <h3 className="mt-2 text-lg font-black text-[#0f172a]">{item.title}</h3>
-                    <p className="mt-3 text-sm leading-6 text-[#4b5563]">{item.body}</p>
-                  </button>
-                )
-              })}
-            </div>
-          </div>
-        </section>
-
-        <section id="result-example" className="mx-auto w-full max-w-[1200px] px-4 py-14 sm:px-6 sm:py-20">
-          <div className="grid gap-10 lg:grid-cols-[0.82fr_1.18fr] lg:items-center">
-            <SectionHeading
-              eyebrow="Приклад результату"
-              title="Що ви отримаєте після оцінки"
-              body="Після короткого тесту або завантаження аналізів Vitaloop показує не просто список показників, а зрозумілий наступний крок."
-            />
-
-            <div className="rounded-[32px] bg-white p-5 shadow-[0_28px_90px_rgba(15,23,42,0.10)] ring-1 ring-[#e5dfd6] sm:p-6">
-              <div className="flex flex-col gap-4 border-b border-[#e5dfd6] pb-5 sm:flex-row sm:items-center sm:justify-between">
+        <section className="border-y border-[#dce5e5] bg-white">
+          <div className="mx-auto grid max-w-[1220px] gap-6 px-5 py-7 sm:px-8 sm:grid-cols-2 lg:grid-cols-4">
+            {TRUST.map(([Icon, title, text]) => (
+              <div key={title} className="flex items-center gap-4">
+                <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-[#e7f6f0] text-[#0b9479]">
+                  <Icon className="h-6 w-6" />
+                </span>
                 <div>
-                  <p className="text-xs font-black uppercase tracking-[0.14em] text-[#0f766e]">Особистий підсумок</p>
-                  <h3 className="mt-2 text-2xl font-black text-[#0f172a]">Персональний підсумок</h3>
+                  <p className="text-sm text-[#10233f]">{title}</p>
+                  <p className="mt-1 text-sm leading-5 text-[#687789]">
+                    {text}
+                  </p>
                 </div>
-                <span className="w-fit rounded-full bg-[#f4eadb] px-4 py-2 text-xs font-black text-[#8a6a30]">Освітній приклад</span>
               </div>
-
-              <div className="mt-5 grid gap-4">
-                {RESULT_EXAMPLE.map((item) => (
-                  <div key={item.label} className="grid gap-2 border-b border-[#eee7dc] pb-4 last:border-0 last:pb-0 sm:grid-cols-[160px_1fr]">
-                    <p className="text-sm font-black text-[#0f172a]">{item.label}</p>
-                    <p className="text-sm leading-7 text-[#4b5563]">{item.value}</p>
-                  </div>
-                ))}
+            ))}
+          </div>
+        </section>
+        <section
+          id="wellbeing"
+          className="scroll-mt-20 mx-auto max-w-[1220px] px-5 pb-28 pt-16 sm:px-8 sm:pb-20 lg:py-20"
+        >
+          <div className="grid gap-6 rounded-[28px] border border-[#cde9df] bg-[#e7f6f0] p-6 sm:p-8 lg:grid-cols-[.72fr_1.28fr] lg:gap-8 lg:items-start">
+            <div>
+              <Eyebrow>Коротка оцінка самопочуття</Eyebrow>
+              <Heading className="max-w-md">
+                Почніть із того, що турбує зараз
+              </Heading>
+              <p className="mt-4 max-w-md text-sm leading-7 text-[#526273]">
+                Оберіть кілька симптомів. Після реєстрації вони збережуться в
+                оцінці — не доведеться обирати їх повторно.
+              </p>
+              <p className="mt-3 text-xs leading-5 text-[#687789]">
+                Оберіть симптоми в картці — продовжите кнопкою внизу екрана.
+              </p>
+            </div>
+            <div className="rounded-[22px] bg-white p-4 shadow-sm sm:p-5">
+              <div className="flex items-center justify-between gap-3 border-b border-[#e7eeee] pb-4">
+                <p className="text-sm font-bold text-[#10233f]">
+                  Що відчуваєте?
+                </p>
+                <p className="text-xs text-[#687789]">
+                  Обрано: {selectedSymptoms.length}
+                </p>
               </div>
-
-              <button onClick={startSignup} className={`${CTA_CLASS} mt-6 w-full sm:w-auto`}>
-                Отримати такий підсумок
-                <ArrowRight className="h-4 w-4" />
+              <div className="mt-4 flex flex-wrap gap-2">
+                {LANDING_SYMPTOMS.map((symptom) => {
+                  const active = selectedSymptoms.includes(symptom);
+                  return (
+                    <button
+                      key={symptom}
+                      onClick={() => toggleSymptom(symptom)}
+                      className={`inline-flex min-h-11 items-center gap-2 rounded-full border px-4 text-sm font-medium transition ${active ? "border-[#0b9479] bg-[#e7f6f0] text-[#087b66]" : "border-[#dce5e5] bg-white text-[#526273] hover:border-[#0b9479]/40"}`}
+                    >
+                      {active && <Check className="h-3.5 w-3.5" />}
+                      {symptom}
+                    </button>
+                  );
+                })}
+              </div>
+              <div className="mt-5 rounded-xl bg-[#f8fbfa] p-4 text-sm leading-6 text-[#526273]">
+                {selectedSymptoms.length
+                  ? "Ваш вибір буде додано до стартової анкети після реєстрації."
+                  : "Можна обрати кілька пунктів або перейти до анкети без вибору."}
+              </div>
+              <button
+                onClick={startSymptoms}
+                className={`${CTA_CLASS} mt-5 w-full`}
+              >
+                {symptomsCta} <ArrowRight className="h-4 w-4" />
               </button>
             </div>
           </div>
         </section>
-
-        <section className="bg-[linear-gradient(180deg,#f8f5f0,#efebe5)] py-14 sm:py-20">
-          <div className="mx-auto grid w-full max-w-[1200px] gap-12 px-4 sm:px-6 lg:grid-cols-2 lg:items-start">
+        <section className="mx-auto max-w-[1220px] px-5 py-20 sm:px-8 lg:py-28">
+          <div className="grid gap-12 lg:grid-cols-[.78fr_1.22fr] lg:items-center">
             <div>
-              <SectionHeading
-                eyebrow="Родина"
-                title="Здоровʼя дорослих і дітей в одному контексті"
-                body="Батькам важливо бачити не тільки окремий показник, а стан, динаміку і питання, з якими варто йти до лікаря."
-              />
-              <div className="mt-8 grid gap-5 sm:grid-cols-3">
-                {FAMILY_GROUPS.map((group) => (
-                  <div key={group.title}>
-                    <h3 className="text-base font-black text-[#0f172a]">{group.title}</h3>
-                    <p className="mt-3 text-sm leading-7 text-[#4b5563]">{group.body.join(' · ')}</p>
-                  </div>
-                ))}
-              </div>
-              <div className="mt-8 rounded-[28px] bg-white/70 p-5 shadow-sm ring-1 ring-[#e5dfd6]">
-                <p className="text-sm font-black text-[#0f172a]">Для дітей часто починають з:</p>
-                <div className="mt-4 flex flex-wrap gap-2">
-                  {FAMILY_CHECKS.map((item) => (
-                    <span key={item} className="inline-flex items-center gap-2 rounded-full bg-[#f8f5f0] px-3 py-2 text-sm font-bold text-[#4b5563]">
-                      <Check className="h-3.5 w-3.5 text-[#0f766e]" />
-                      {item}
+              <Eyebrow>Звичний український формат</Eyebrow>
+              <Heading>Ваш PDF — вже точка старту</Heading>
+              <p className="mt-5 text-base leading-7 text-[#526273]">
+                Не потрібно вручну переносити десятки цифр. Додайте файл з
+                лабораторії — VITALOOP допоможе розкласти результати на
+                зрозумілі частини.
+              </p>
+              <div className="mt-7 flex flex-wrap gap-2">
+                {["Сінево", "ДІЛА", "Ескулаб", "SmartLab", "CSD", "Інші"].map(
+                  (lab) => (
+                    <span
+                      key={lab}
+                      className="rounded-full border border-[#dce5e5] bg-white px-4 py-2 text-sm font-bold"
+                    >
+                      {lab}
                     </span>
-                  ))}
-                </div>
+                  ),
+                )}
               </div>
+              <p className="mt-4 text-xs leading-5 text-[#687789]">
+                Це приклади поширених форматів бланків, а не перелік партнерів.
+                Офіційні партнерства позначаємо окремо.
+              </p>
+              <button
+                onClick={signup}
+                className="mt-8 inline-flex items-center gap-2 text-sm font-bold text-[#0b9479]"
+              >
+                Як підготувати бланк <ArrowRight className="h-4 w-4" />
+              </button>
             </div>
-
-            <div>
-              <SectionHeading
-                eyebrow="Пріоритети"
-                title="Не оцінка здоровʼя, а карта уваги"
-                body="Індекс пріоритетів допомагає зрозуміти, що варто перевірити або обговорити першим. Це не діагноз і не медичний висновок."
-              />
-              <div className="mt-8 space-y-5">
-                {PRIORITY_LEVELS.map((level) => (
-                  <div key={level.title} className="border-l-2 border-[#0f766e]/25 pl-5">
-                    <p className="text-base font-black text-[#0f172a]">{level.title}</p>
-                    <p className="mt-1 text-sm leading-6 text-[#4b5563]">{level.body}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section id="laboratories" className="mx-auto w-full max-w-[1200px] px-4 py-14 sm:px-6 sm:py-20">
-          <div className="grid gap-12 lg:grid-cols-[1fr_1fr] lg:items-start">
-            <div>
-              <SectionHeading
-                eyebrow="Приклади"
-                title="Типові сценарії, з яких починають"
-                body="Це освітні приклади, не діагноз і не обіцянка результату. Їх задача — показати, як сервіс структурує запит."
-              />
-              <div className="mt-8 space-y-6">
-                {SCENARIOS.map((item) => (
-                  <div key={item.title} className="border-t border-[#e5dfd6] pt-5">
-                    <h3 className="text-lg font-black text-[#0f172a]">{item.title}</h3>
-                    <p className="mt-2 text-sm leading-7 text-[#4b5563]">
-                      {item.symptoms} → {item.direction} → {item.action}.
+            <BrowserFrame className="mx-auto w-full max-w-[690px]">
+              <div className="grid min-h-[340px] grid-cols-[.8fr_1.2fr] bg-[#f5fbf9]">
+                <div className="flex flex-col justify-between border-r border-[#dce5e5] p-5">
+                  <div>
+                    <p className="text-xs font-bold text-[#0b9479]">КРОК 01</p>
+                    <h3 className="mt-3 text-xl font-bold">Додайте файл</h3>
+                    <p className="mt-2 text-sm leading-6 text-[#687789]">
+                      PDF, фото або скан бланка.
                     </p>
                   </div>
-                ))}
+                  <div className="rounded-xl border-2 border-dashed border-[#9bd8c9] bg-white p-4">
+                    <FileUp className="h-5 w-5 text-[#0b9479]" />
+                    <p className="mt-3 text-xs font-bold">
+                      analizy_10-2026.pdf
+                    </p>
+                    <p className="mt-1 text-[11px] text-[#687789]">
+                      PDF · 1.4 MB
+                    </p>
+                  </div>
+                </div>
+                <div className="relative overflow-hidden bg-white">
+                  <img
+                    src="/images/cabinet/upload.png"
+                    alt="Екран завантаження аналізу"
+                    className="absolute left-[10%] top-[5%] w-[82%] rounded-lg shadow-lg"
+                  />
+                </div>
               </div>
-            </div>
-
-            <div>
-              <SectionHeading
-                eyebrow="Лабораторії"
-                title="Підтримуємо популярні формати результатів"
-                body="Можна завантажити PDF або фото з різних лабораторій України. Якщо вашої лабораторії немає у списку — результати все одно можна завантажити. Партнерства будемо позначати окремо, коли вони будуть офіційними."
-              />
-              <div className="mt-8 flex flex-wrap gap-3">
-                {LABS.map((lab) => (
-                  <button key={lab.name} onClick={() => goPage('/laboratorii')} className="rounded-full bg-white px-5 py-3 text-sm font-black text-[#0f172a] shadow-sm ring-1 ring-[#e5dfd6] transition hover:-translate-y-0.5 hover:text-[#0f766e]">
-                    {lab.name}
+            </BrowserFrame>
+          </div>
+        </section>
+        <section
+          id="report"
+          className="overflow-hidden bg-[#10233f] py-20 text-white sm:py-28"
+        >
+          <div className="mx-auto max-w-[1220px] px-5 sm:px-8">
+            <div className="grid gap-8 lg:grid-cols-[.82fr_1.18fr] lg:items-start">
+              <div>
+                <Eyebrow>Приклад у кабінеті</Eyebrow>
+                <h2 className="mt-3 text-[38px] font-bold leading-[1.04] tracking-[-.04em] sm:text-[54px]">
+                  Результати, які стають зрозумілими
+                </h2>
+                <p className="mt-5 max-w-xl text-base leading-7 text-[#c2ced9]">
+                  Реальний інтерфейс продукту об’єднує результати, симптоми та
+                  наступний check-in. Він не замінює лікаря — зате допомагає не
+                  розгубитися перед консультацією й вийти з неї з чіткішим
+                  планом.
+                </p>
+              </div>
+              <div className="flex flex-wrap gap-2 lg:justify-center lg:pt-20">
+                {TABS.map((tab) => (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveId(tab.id)}
+                    className={`rounded-full px-4 py-2 text-sm font-bold transition ${activeId === tab.id ? "bg-[#f4c542] text-[#10233f]" : "border border-white/20 text-white hover:bg-white/10"}`}
+                  >
+                    {tab.label}
                   </button>
                 ))}
               </div>
-              <button onClick={() => goPage('/analizy')} className="mt-8 inline-flex items-center gap-2 text-sm font-black text-[#0f766e] transition hover:gap-3">
-                Як працює розбір аналізів
-                <ArrowRight className="h-4 w-4" />
-              </button>
             </div>
-          </div>
-        </section>
-
-        <section className="bg-white py-14 sm:py-20">
-          <div className="mx-auto w-full max-w-[1200px] px-4 sm:px-6">
-            <SectionHeading center eyebrow="Корисні матеріали" title="Питання, з яких часто починають" />
-            <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-              {EDUCATION_ARTICLES.slice(0, 4).map((article) => (
-                <button key={article.title} onClick={() => goPage(article.path)} className="rounded-[22px] bg-[#f8f5f0] p-5 text-left text-base font-black text-[#0f172a] transition hover:-translate-y-0.5 hover:bg-[#f1fbf8] hover:text-[#0f766e]">
-                  {article.title}
-                </button>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <section id="pricing" className="mx-auto w-full max-w-[1200px] px-4 py-12 sm:px-6 sm:py-16 md:py-20">
-          <SectionHeading center eyebrow="Тарифи" title="Почніть безкоштовно, масштабуйте за потребою" body="Для першої оцінки достатньо безкоштовного старту. Premium потрібен для регулярної роботи з аналізами й динамікою." />
-          <div className="mx-auto mt-8 grid max-w-[1100px] gap-4 lg:grid-cols-3">
-            {PRICING.map((plan) => (
-              <article
-                key={plan.name}
-                className={`relative rounded-[28px] border p-6 shadow-sm ${plan.featured ? 'border-[#0f766e] bg-[#0f172a] text-white shadow-[0_28px_80px_rgba(15,23,42,0.24)]' : plan.comingSoon ? 'border-[#e5dfd6] bg-[#f8f5f0] text-[#0f172a]' : 'border-[#e5dfd6] bg-white text-[#0f172a]'}`}
-              >
-                {plan.featured && (
-                  <span className="absolute right-5 top-5 rounded-full bg-[#d4b483] px-3 py-1 text-xs font-black text-[#111111]">
-                    Найкращий вибір
-                  </span>
-                )}
-                <p className={`text-sm font-black uppercase tracking-[0.14em] ${plan.featured ? 'text-[#5eead4]' : 'text-[#0f766e]'}`}>{plan.name}</p>
-                <h3 className="mt-3 text-4xl font-black">{plan.price}</h3>
-                <p className={`mt-1 text-sm ${plan.featured ? 'text-[#cbd5e1]' : 'text-[#6b7280]'}`}>{plan.note}</p>
-                <p className={`mt-5 text-sm leading-7 ${plan.featured ? 'text-[#e2e8f0]' : 'text-[#4b5563]'}`}>{plan.description}</p>
-                <div className="mt-6 grid gap-3">
-                  {plan.features.map((feature) => (
-                    <div key={feature} className="flex items-start gap-3">
-                      <span className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full ${plan.featured ? 'bg-white text-[#0f172a]' : 'bg-[#f1fbf8] text-[#0f766e]'}`}>
-                        <Check className="h-3.5 w-3.5" />
-                      </span>
-                      <span className={`text-sm leading-6 ${plan.featured ? 'text-white' : 'text-[#4b5563]'}`}>{feature}</span>
-                    </div>
-                  ))}
+            <div className="mt-0 grid gap-6 lg:grid-cols-[.82fr_1.18fr] lg:items-center lg:gap-10">
+              <div className="lg:-mt-24">
+                <p className="text-sm font-bold text-[#8fe0cc]">
+                  {active.label}
+                </p>
+                <h3 className="mt-3 text-3xl font-bold leading-tight">
+                  {active.title}
+                </h3>
+                <p className="mt-5 text-base leading-7 text-[#c2ced9]">
+                  {active.text}
+                </p>
+                <div className="mt-7 border-l-2 border-[#f4c542] pl-4 text-sm leading-6 text-[#e8eef2]">
+                  {active.note}
                 </div>
-                <button onClick={plan.comingSoon ? undefined : startSignup} disabled={plan.comingSoon} className={`${plan.comingSoon ? 'inline-flex min-h-11 w-full cursor-not-allowed items-center justify-center rounded-full bg-white px-5 py-3 text-sm font-black text-[#6b7280] ring-1 ring-[#e5dfd6]' : CTA_CLASS} mt-7 w-full`}>
-                  {plan.cta}
+                <button
+                  onClick={signup}
+                  className="mt-9 inline-flex items-center gap-2 text-sm font-bold text-[#8fe0cc]"
+                >
+                  Відкрити повний приклад <ArrowRight className="h-4 w-4" />
                 </button>
+              </div>
+              <div className="relative order-first -mt-3 lg:order-none lg:-mt-40">
+                <div className="absolute inset-8 rounded-[28px] bg-[#0b9479]/30 blur-3xl" />
+                <img
+                  src={active.image}
+                  alt={`Приклад інтерфейсу Vitaloop: ${active.label}`}
+                  className="relative mx-auto max-h-[580px] w-auto max-w-full drop-shadow-2xl"
+                />
+              </div>
+            </div>
+          </div>
+        </section>
+        <section
+          id="how"
+          className="mx-auto max-w-[1220px] px-5 py-20 sm:px-8 lg:py-28"
+        >
+          <div className="max-w-3xl">
+            <Eyebrow>Як це працює</Eyebrow>
+            <Heading>
+              Від «я не знаю, з чого почати» до підготовленої розмови з лікарем
+            </Heading>
+            <p className="mt-5 max-w-2xl text-base leading-7 text-[#526273]">
+              Без медичного жаргону та непотрібних форм. Кожен крок дає вам
+              трохи більше порядку, контексту й впевненості.
+            </p>
+          </div>
+          <div className="relative mt-10 grid gap-3 sm:mt-12 sm:grid-cols-2 sm:gap-4 xl:grid-cols-4 xl:gap-0">
+            <div className="absolute left-[12%] right-[12%] top-7 hidden h-px bg-[#b8ddd3] xl:block" />
+            {STEPS.map(([num, title, text, note]) => (
+              <article
+                key={num}
+                className="relative z-10 flex flex-col rounded-[22px] border border-[#dce5e5] bg-white p-5 shadow-sm sm:min-h-[270px] xl:min-h-[300px] xl:rounded-none xl:border-0 xl:bg-[#fffcf7] xl:px-6 xl:shadow-none"
+              >
+                <span className="grid h-14 w-14 place-items-center rounded-full border border-[#9bd8c9] bg-white text-sm font-bold text-[#0b9479] shadow-sm">
+                  {num}
+                </span>
+                <h3 className="mt-5 text-xl font-bold">{title}</h3>
+                <p className="mt-3 text-sm leading-6 text-[#526273]">{text}</p>
+                <p className="mt-5 border-t border-[#e7eeee] pt-4 text-xs leading-5 text-[#687789] sm:mt-auto">
+                  {note}
+                </p>
               </article>
             ))}
           </div>
         </section>
-
-        <section className="mx-auto w-full max-w-[920px] px-4 pb-12 sm:px-6 sm:pb-16 md:pb-20">
-          <SectionHeading center eyebrow="Питання" title="Коротко про важливе" />
-          <div className="mt-7 divide-y divide-[#e5dfd6] overflow-hidden rounded-[26px] border border-[#e5dfd6] bg-white shadow-sm">
-            {FAQ_ITEMS.map((item) => (
-              <details key={item.question} className="group p-4 open:bg-[#f8f5f0] sm:p-5">
-                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-left text-base font-black text-[#0f172a]">
-                  {item.question}
-                  <ChevronDown className="h-5 w-5 shrink-0 text-[#6b7280] transition group-open:rotate-180" />
+        <section className="bg-[#e7f6f0] py-20 sm:py-28">
+          <div className="mx-auto max-w-[1220px] px-5 sm:px-8">
+            <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
+              <div className="max-w-[1080px]">
+                <Eyebrow>Ваші життєві сценарії</Eyebrow>
+                <Heading className="max-w-[980px]">
+                  Не «середній пацієнт». Ваша ситуація.
+                </Heading>
+                <p className="mt-5 text-base leading-7 text-[#526273]">
+                  Оберіть близьку ситуацію — так легше зрозуміти, які дані
+                  зібрати перед консультацією й з чого почати розмову.
+                </p>
+              </div>
+            </div>
+            <div className="mt-10 grid gap-4 md:grid-cols-3">
+              {SCENARIOS.map(([num, title, lead, text, path]) => (
+                <article
+                  key={num}
+                  className="flex min-h-[330px] flex-col rounded-[24px] bg-[#fffcf7] p-6"
+                >
+                  <span className="text-sm font-bold text-[#0b9479]">
+                    {num}
+                  </span>
+                  <h3 className="mt-7 text-2xl font-bold leading-tight">
+                    {title}
+                  </h3>
+                  <p className="mt-4 text-sm font-medium leading-6 text-[#10233f]">
+                    {lead}
+                  </p>
+                  <p className="mt-4 text-sm leading-6 text-[#526273]">
+                    {text}
+                  </p>
+                  <button
+                    onClick={() => navigate(getUaPath(path))}
+                    className="mt-auto pt-7 text-left text-sm font-bold text-[#0b9479]"
+                  >
+                    Дізнатися більше <ArrowRight className="inline h-4 w-4" />
+                  </button>
+                </article>
+              ))}
+            </div>
+          </div>
+        </section>
+        <section className="mx-auto max-w-[1280px] px-5 py-20 sm:px-8 lg:py-28">
+          <div className="grid gap-12 lg:grid-cols-[.95fr_1.05fr] lg:items-center">
+            <div className="relative">
+              <img
+                src="/images/cabinet/results.png"
+                alt="Результати аналізів у кабінеті Vitaloop"
+                className="mx-auto max-h-[550px] max-w-full"
+              />
+              <div className="absolute bottom-8 left-[5%] rounded-2xl bg-white p-4 shadow-xl">
+                <LockKeyhole className="h-4 w-4 text-[#0b9479]" />
+                <p className="mt-2 text-xs font-bold">Ваші дані — приватні</p>
+              </div>
+            </div>
+            <div className="max-w-[610px]">
+              <Eyebrow>Маленький крок сьогодні</Eyebrow>
+              <Heading>Завантажте бланк аналізів або опишіть симптоми</Heading>
+              <p className="mt-5 text-base leading-7 text-[#526273]">
+                Оберіть зручний старт: додайте PDF, фото чи скан із лабораторії
+                — або коротко опишіть, що вас турбує. VITALOOP допоможе зібрати
+                це в контекст для наступного кроку.
+              </p>
+              <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+                <button onClick={signup} className={CTA_CLASS}>
+                  Створити профіль <ArrowRight className="h-4 w-4" />
+                </button>
+                <button
+                  onClick={() => scrollTo("pricing")}
+                  className="min-h-12 px-3 text-sm font-bold text-[#0b9479]"
+                >
+                  Переглянути тарифи
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+        <section
+          id="pricing"
+          className="border-y border-[#dce5e5] bg-white py-20"
+        >
+          <div className="mx-auto max-w-[960px] px-5 sm:px-8">
+            <div className="text-center">
+              <Eyebrow>Тарифи</Eyebrow>
+              <Heading>Почніть у своєму темпі</Heading>
+              <div className="mx-auto mt-6 inline-flex rounded-full border border-[#dce5e5] bg-[#f8fbfa] p-1">
+                <button
+                  onClick={() => setBilling("month")}
+                  className={`rounded-full px-4 py-2 text-sm font-bold transition ${billing === "month" ? "bg-white text-[#10233f] shadow-sm" : "text-[#687789]"}`}
+                >
+                  Щомісяця
+                </button>
+                <button
+                  onClick={() => setBilling("year")}
+                  className={`rounded-full px-4 py-2 text-sm font-bold transition ${billing === "year" ? "bg-white text-[#10233f] shadow-sm" : "text-[#687789]"}`}
+                >
+                  Щороку
+                </button>
+              </div>
+            </div>
+            <div className="mt-10 grid gap-4 md:grid-cols-2">
+              {PRICING.map((plan) => (
+                <article
+                  key={plan.name}
+                  className={`flex h-full flex-col rounded-[24px] border p-7 ${plan.featured ? "border-[#0b9479] bg-[#10233f] text-white" : "border-[#dce5e5] bg-[#fffcf7]"}`}
+                >
+                  <p
+                    className={`text-sm font-bold ${plan.featured ? "text-[#8fe0cc]" : "text-[#0b9479]"}`}
+                  >
+                    {plan.name}
+                  </p>
+                  <p className="mt-4 text-4xl font-bold">
+                    {plan.featured
+                      ? billing === "year"
+                        ? "2 499 грн/рік"
+                        : "249 грн/міс"
+                      : plan.price}
+                  </p>
+                  <p
+                    className={`mt-1 text-sm ${plan.featured ? "text-[#c2ced9]" : "text-[#687789]"}`}
+                  >
+                    {plan.featured
+                      ? billing === "year"
+                        ? "вигідніше для регулярної динаміки"
+                        : "або 2 499 грн/рік"
+                      : plan.note}
+                  </p>
+                  <p
+                    className={`mt-6 text-sm leading-6 ${plan.featured ? "text-[#dce7ed]" : "text-[#526273]"}`}
+                  >
+                    {plan.description}
+                  </p>
+                  <div className="mt-7 mb-8 grid gap-3">
+                    {plan.features.map((feature) => (
+                      <p key={feature} className="text-sm">
+                        <Check
+                          className={`mr-2 inline h-4 w-4 ${plan.featured ? "text-[#8fe0cc]" : "text-[#0b9479]"}`}
+                        />
+                        {feature}
+                      </p>
+                    ))}
+                  </div>
+                  <button
+                    onClick={signup}
+                    className={`${CTA_CLASS} mt-auto w-full`}
+                  >
+                    {plan.cta} <ArrowRight className="h-4 w-4" />
+                  </button>
+                </article>
+              ))}
+            </div>
+            <p className="mt-5 text-center text-xs text-[#687789]">
+              Vitaloop не є заміною медичної консультації.
+            </p>
+          </div>
+        </section>
+        <section className="mx-auto max-w-[860px] px-5 py-20 sm:px-8">
+          <div className="text-center">
+            <Eyebrow>Питання</Eyebrow>
+            <Heading>Коротко про важливе</Heading>
+          </div>
+          <div className="mt-8 divide-y divide-[#dce5e5] rounded-2xl border border-[#dce5e5] bg-white">
+            {FAQ_ITEMS.map(([question, answer]) => (
+              <details key={question} className="group p-5">
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-5 font-bold">
+                  <span>{question}</span>
+                  <ChevronDown className="h-5 w-5 shrink-0 text-[#687789] transition group-open:rotate-180" />
                 </summary>
-                <p className="mt-3 max-w-3xl text-sm leading-7 text-[#4b5563]">{item.answer}</p>
+                <p className="mt-3 max-w-2xl text-sm leading-6 text-[#526273]">
+                  {answer}
+                </p>
               </details>
             ))}
           </div>
         </section>
-
-        <section className="border-t border-[#e5dfd6] bg-[linear-gradient(145deg,#0f172a,#0f766e)] py-12 text-white sm:py-16">
-          <div className="mx-auto flex w-full max-w-[1200px] flex-col items-start justify-between gap-5 px-4 sm:px-6 md:flex-row md:items-center">
-            <div>
-              <h2 className="max-w-3xl text-[30px] font-black leading-tight tracking-tight sm:text-[44px]">Почніть краще розуміти своє здоровʼя вже сьогодні</h2>
-              <p className="mt-3 max-w-2xl text-sm leading-7 text-[#d9fffb] sm:text-base">
-                Не чекайте, поки симптоми стануть проблемою. Почніть із короткої оцінки стану.
-              </p>
-            </div>
-            <button onClick={startSignup} className="inline-flex items-center justify-center gap-2 rounded-full bg-white px-5 py-2.5 text-sm font-black text-[#0f172a] shadow-[0_18px_42px_rgba(0,0,0,0.18)] transition hover:-translate-y-0.5">
-              Створити безкоштовний акаунт
-              <ArrowRight className="h-4 w-4" />
-            </button>
-          </div>
-        </section>
-
-        <UaFooter />
       </main>
-
-      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-[#e5dfd6] bg-white/94 px-4 py-3 shadow-[0_-12px_34px_rgba(15,23,42,0.10)] backdrop-blur-xl md:hidden">
-        <button onClick={startSignup} className={`${CTA_CLASS} w-full`}>
-          Отримати персональну оцінку
-          <ArrowRight className="h-4 w-4" />
-        </button>
-      </div>
+      <UaFooter />
     </div>
-  )
+  );
 }

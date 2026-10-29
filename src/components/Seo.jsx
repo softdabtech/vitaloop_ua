@@ -1,8 +1,8 @@
 import { Helmet } from 'react-helmet-async'
 
 const BASE_URL = 'https://ua.vitaloop.today'
-const DEFAULT_TITLE = 'Vitaloop Ukraine — персональна оцінка симптомів і аналізів'
-const DEFAULT_DESCRIPTION = 'Постійна втома, поганий сон чи низька енергія? Vitaloop допоможе знайти можливі причини, пріоритети аналізів і персональний план дій.'
+const DEFAULT_TITLE = 'VITALOOP — пояснення аналізів і симптомів українською'
+const DEFAULT_DESCRIPTION = 'Завантажте PDF, фото або скан аналізів. VITALOOP допомагає зібрати симптоми, результати лабораторії та питання для розмови з лікарем.'
 const DEFAULT_IMAGE = `${BASE_URL}/images/ua-og-preview-20260604.png`
 
 export default function Seo({

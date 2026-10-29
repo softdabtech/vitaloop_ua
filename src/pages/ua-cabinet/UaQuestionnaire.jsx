@@ -7,7 +7,14 @@ const SYMPTOMS = ['Втома', 'Поганий сон', 'Низька енер�
 
 export default function UaQuestionnaire() {
   const navigate = useNavigate()
-  const [selected, setSelected] = useState([])
+  const [selected, setSelected] = useState(() => {
+    try {
+      const stored = JSON.parse(window.sessionStorage.getItem('vitaloop-intake-symptoms') || '[]')
+      return Array.isArray(stored) ? stored.filter((item) => SYMPTOMS.includes(item)) : []
+    } catch {
+      return []
+    }
+  })
 
   function toggle(item) {
     setSelected((prev) => prev.includes(item) ? prev.filter((x) => x !== item) : [...prev, item])
@@ -15,6 +22,7 @@ export default function UaQuestionnaire() {
 
   function continueFlow() {
     toast.success(selected.length ? `Обрано симптомів: ${selected.length}` : 'Можна почати з аналізів')
+    window.sessionStorage.removeItem('vitaloop-intake-symptoms')
     navigate('/upload')
   }
 

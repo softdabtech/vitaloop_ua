@@ -1,43 +1,51 @@
-import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
-import { useEffect } from 'react'
-import UaLanding from './pages/UaLanding.jsx'
-import UaPage from './pages/UaPage.jsx'
-import Login from './pages/Login.jsx'
-import UaCabinetLayout from './components/ua/UaCabinetLayout.jsx'
-import UaDashboard from './pages/ua-cabinet/UaDashboard.jsx'
-import UaUpload from './pages/ua-cabinet/UaUpload.jsx'
-import UaLabResults from './pages/ua-cabinet/UaLabResults.jsx'
-import UaResults from './pages/ua-cabinet/UaResults.jsx'
-import UaProtocol from './pages/ua-cabinet/UaProtocol.jsx'
-import UaQuestionnaire from './pages/ua-cabinet/UaQuestionnaire.jsx'
-import { UaSettings, UaSubscription } from './pages/ua-cabinet/UaSimplePage.jsx'
-import UaNotFound from './pages/UaNotFound.jsx'
-import { useAuth } from './hooks/useAuth.js'
+import { Navigate, Route, Routes, useLocation } from "react-router-dom";
+import { useEffect } from "react";
+import UaLanding from "./pages/UaLanding.jsx";
+import UaHealthHub from "./pages/UaHealthHub.jsx";
+import UaFaqPage from "./pages/UaFaqPage.jsx";
+import UaPage from "./pages/UaPage.jsx";
+import UaLegalPage from "./pages/UaLegalPage.jsx";
+import Login from "./pages/Login.jsx";
+import UaCabinetLayout from "./components/ua/UaCabinetLayout.jsx";
+import UaDashboard from "./pages/ua-cabinet/UaDashboard.jsx";
+import UaUpload from "./pages/ua-cabinet/UaUpload.jsx";
+import UaLabResults from "./pages/ua-cabinet/UaLabResults.jsx";
+import UaResults from "./pages/ua-cabinet/UaResults.jsx";
+import UaProtocol from "./pages/ua-cabinet/UaProtocol.jsx";
+import UaQuestionnaire from "./pages/ua-cabinet/UaQuestionnaire.jsx";
+import {
+  UaSettings,
+  UaSubscription,
+} from "./pages/ua-cabinet/UaSimplePage.jsx";
+import UaNotFound from "./pages/UaNotFound.jsx";
+import { useAuth } from "./hooks/useAuth.js";
 
 function LoadingScreen() {
   return (
     <div className="grid min-h-[100svh] place-items-center bg-[#f8f5f0] text-[#0f172a]">
       <div className="text-center">
         <div className="mx-auto h-10 w-10 animate-spin rounded-full border-4 border-[#d4b483] border-t-[#0f766e]" />
-        <p className="mt-4 text-sm font-black text-[#64748b]">Готуємо ваш кабінет...</p>
+        <p className="mt-4 text-sm font-black text-[#64748b]">
+          Готуємо ваш кабінет...
+        </p>
       </div>
     </div>
-  )
+  );
 }
 
 function ScrollToTop() {
-  const location = useLocation()
+  const location = useLocation();
   useEffect(() => {
-    window.scrollTo(0, 0)
-  }, [location.pathname])
-  return null
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
+  return null;
 }
 
 function ProtectedRoute({ children }) {
-  const { user, loading } = useAuth()
-  if (loading) return <LoadingScreen />
-  if (!user) return <Navigate to="/login" replace />
-  return children
+  const { user, loading } = useAuth();
+  if (loading) return <LoadingScreen />;
+  if (!user) return <Navigate to="/login" replace />;
+  return children;
 }
 
 function CabinetRoute({ children }) {
@@ -45,7 +53,7 @@ function CabinetRoute({ children }) {
     <ProtectedRoute>
       <UaCabinetLayout>{children}</UaCabinetLayout>
     </ProtectedRoute>
-  )
+  );
 }
 
 export default function App() {
@@ -54,24 +62,135 @@ export default function App() {
       <ScrollToTop />
       <Routes>
         <Route path="/" element={<UaLanding />} />
-        <Route path="/samopochuttia" element={<UaPage pageSlug="samopochuttia" />} />
+        <Route
+          path="/samopochuttia"
+          element={<UaPage pageSlug="samopochuttia" />}
+        />
         <Route path="/symptomy" element={<UaPage pageSlug="symptomy" />} />
         <Route path="/analizy" element={<UaPage pageSlug="analizy" />} />
-        <Route path="/laboratorii" element={<UaPage pageSlug="laboratorii" />} />
+        <Route
+          path="/laboratorii"
+          element={<UaPage pageSlug="laboratorii" />}
+        />
         <Route path="/tarify" element={<UaPage pageSlug="tarify" />} />
+        <Route path="/health-hub" element={<UaHealthHub />} />
+        <Route path="/health-hub/topics/:topicSlug" element={<UaHealthHub />} />
+        <Route path="/health-hub/:articleSlug" element={<UaHealthHub />} />
+        <Route path="/faq" element={<UaFaqPage />} />
+        <Route path="/pricing" element={<Navigate to="/tarify" replace />} />
+        <Route
+          path="/privacy"
+          element={<Navigate to="/privacy-policy" replace />}
+        />
+        <Route
+          path="/ferytyn"
+          element={<Navigate to="/health-hub/ferytyn-ta-vtoma" replace />}
+        />
+        <Route
+          path="/vtoma"
+          element={<Navigate to="/health-hub/postiyna-vtoma" replace />}
+        />
+        <Route
+          path="/vitamin-d"
+          element={<Navigate to="/health-hub/vitamin-d-vtoma" replace />}
+        />
+        <Route
+          path="/volossia"
+          element={<Navigate to="/health-hub/volossia-ta-analizy" replace />}
+        />
+        <Route
+          path="/son"
+          element={<Navigate to="/health-hub/poganyi-son-prichyny" replace />}
+        />
+        <Route
+          path="/dity-analizy"
+          element={<Navigate to="/analizy" replace />}
+        />
+        <Route path="/terms" element={<UaLegalPage pageSlug="terms" />} />
+        <Route
+          path="/refund-policy"
+          element={<UaLegalPage pageSlug="refund-policy" />}
+        />
+        <Route
+          path="/privacy-policy"
+          element={<UaLegalPage pageSlug="privacy-policy" />}
+        />
+        <Route path="/contact" element={<UaLegalPage pageSlug="contact" />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/auth/confirmation" element={<Login pendingConfirmation />} />
-        <Route path="/dashboard" element={<CabinetRoute><UaDashboard /></CabinetRoute>} />
-        <Route path="/onboarding" element={<Navigate to="/dashboard" replace />} />
-        <Route path="/questionnaire" element={<CabinetRoute><UaQuestionnaire /></CabinetRoute>} />
-        <Route path="/upload" element={<CabinetRoute><UaUpload /></CabinetRoute>} />
-        <Route path="/lab-results" element={<CabinetRoute><UaLabResults /></CabinetRoute>} />
-        <Route path="/results/:uploadId" element={<CabinetRoute><UaResults /></CabinetRoute>} />
-        <Route path="/subscription" element={<CabinetRoute><UaSubscription /></CabinetRoute>} />
-        <Route path="/settings" element={<CabinetRoute><UaSettings /></CabinetRoute>} />
-        <Route path="/protocol/:uploadId" element={<CabinetRoute><UaProtocol /></CabinetRoute>} />
+        <Route
+          path="/auth/confirmation"
+          element={<Login pendingConfirmation />}
+        />
+        <Route
+          path="/dashboard"
+          element={
+            <CabinetRoute>
+              <UaDashboard />
+            </CabinetRoute>
+          }
+        />
+        <Route
+          path="/onboarding"
+          element={<Navigate to="/dashboard" replace />}
+        />
+        <Route
+          path="/questionnaire"
+          element={
+            <CabinetRoute>
+              <UaQuestionnaire />
+            </CabinetRoute>
+          }
+        />
+        <Route
+          path="/upload"
+          element={
+            <CabinetRoute>
+              <UaUpload />
+            </CabinetRoute>
+          }
+        />
+        <Route
+          path="/lab-results"
+          element={
+            <CabinetRoute>
+              <UaLabResults />
+            </CabinetRoute>
+          }
+        />
+        <Route
+          path="/results/:uploadId"
+          element={
+            <CabinetRoute>
+              <UaResults />
+            </CabinetRoute>
+          }
+        />
+        <Route
+          path="/subscription"
+          element={
+            <CabinetRoute>
+              <UaSubscription />
+            </CabinetRoute>
+          }
+        />
+        <Route
+          path="/settings"
+          element={
+            <CabinetRoute>
+              <UaSettings />
+            </CabinetRoute>
+          }
+        />
+        <Route
+          path="/protocol/:uploadId"
+          element={
+            <CabinetRoute>
+              <UaProtocol />
+            </CabinetRoute>
+          }
+        />
         <Route path="*" element={<UaNotFound />} />
       </Routes>
     </>
-  )
+  );
 }

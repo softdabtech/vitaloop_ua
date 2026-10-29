@@ -19,7 +19,15 @@ const queryClient = new QueryClient({
   },
 })
 
-ReactDOM.createRoot(document.getElementById('root')).render(
+const rootElement = document.getElementById('root')
+const splashElement = document.getElementById('app-splash')
+
+const hideAppSplash = () => {
+  document.body.classList.add('app-ready')
+  splashElement?.remove()
+}
+
+ReactDOM.createRoot(rootElement).render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
       <HelmetProvider>
@@ -47,3 +55,5 @@ ReactDOM.createRoot(document.getElementById('root')).render(
     </QueryClientProvider>
   </React.StrictMode>,
 )
+
+window.requestAnimationFrame(hideAppSplash)
